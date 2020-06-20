@@ -15,8 +15,8 @@ struct _E_Config_Dialog_Data
 };
 
 static void        *_create_data(E_Config_Dialog *cfd);
-static void         _free_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata);
-static Evas_Object *_basic_create_widgets(E_Config_Dialog *cfd, Evas *evas,
+static void         _free_data(E_Config_Dialog *cfd __UNUSED__, E_Config_Dialog_Data *cfdata);
+static Evas_Object *_basic_create_widgets(E_Config_Dialog *cfd __UNUSED__, Evas *evas,
                                           E_Config_Dialog_Data *cfdata);
 static int          _basic_apply_data(E_Config_Dialog *cfd,
                                       E_Config_Dialog_Data *cfdata);
@@ -75,7 +75,7 @@ _create_data(E_Config_Dialog *cfd)
 }
 
 static void
-_free_data(__UNUSED__  E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
+_free_data(E_Config_Dialog *cfd __UNUSED__, E_Config_Dialog_Data *cfdata)
 {
    if (!forecasts_config)
      return;
@@ -86,7 +86,7 @@ _free_data(__UNUSED__  E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
 }
 
 static Evas_Object *
-_basic_create_widgets(__UNUSED__  E_Config_Dialog *cfd, Evas *evas,
+_basic_create_widgets(E_Config_Dialog *cfd __UNUSED__, Evas *evas,
                       E_Config_Dialog_Data *cfdata)
 {
    Evas_Object *o, *of, *ob;

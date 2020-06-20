@@ -3,15 +3,16 @@ dnl Process this file with autoconf to produce a configure script.
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT(forecasts, 0.2.0, viktor@bloka.org)
+AC_INIT(forecasts, 0.0.1, s.uram@centrum.sk)
 AC_PREREQ(2.52)
 AC_CONFIG_SRCDIR(configure.ac)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_ISC_POSIX
 
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.10)
 AM_CONFIG_HEADER(config.h)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_PROG_CC
 AM_PROG_CC_STDC
@@ -72,3 +73,11 @@ $po_makefile_in
 ], [
 ])
 
+echo
+cat << SUMMARY_EOF
+Summary:
+ * project.........: $PACKAGE $VERSION
+ * install.........: $datadir
+ * CFLAGS..........: $CFLAGS
+ * LDFLAGS.........: $LDFLAGS
+SUMMARY_EOF

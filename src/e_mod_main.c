@@ -24,9 +24,9 @@ static E_Gadcon_Client *_gc_init(E_Gadcon *gc, const char *name,
                                  const char *id, const char *style);
 static void             _gc_shutdown(E_Gadcon_Client *gcc);
 static void             _gc_orient(E_Gadcon_Client *gcc, E_Gadcon_Orient orient);
-static const char      *_gc_label(const E_Gadcon_Client_Class *client_class);
-static Evas_Object     *_gc_icon(const E_Gadcon_Client_Class *client_class, Evas *evas);
-static const char      *_gc_id_new(const E_Gadcon_Client_Class *client_class);
+static const char      *_gc_label(const E_Gadcon_Client_Class *client_class __UNUSED__);
+static Evas_Object     *_gc_icon(const E_Gadcon_Client_Class *client_class __UNUSED__, Evas *evas);
+static const char      *_gc_id_new(const E_Gadcon_Client_Class *client_class __UNUSED__);
 
 static E_Config_DD *conf_edd = NULL;
 static E_Config_DD *conf_item_edd = NULL;
@@ -121,18 +121,17 @@ struct
 };
 
 /* Module Function Protos */
-static void         _forecasts_cb_mouse_down(void *data, Evas *e, Evas_Object *obj,
-                                             void *event_info);
-static void         _forecasts_menu_cb_configure(void *data, E_Menu *m,
-                                                 E_Menu_Item *mi);
+static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+                         void *event_info __UNUSED__);
+static void         _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
 //static void         _forecasts_menu_cb_post(void *data, E_Menu *m);  Segfault issue removal
 static Eina_Bool    _forecasts_cb_check(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
-static Eina_Bool    _forecasts_server_add(void *data, int type, void *event);
-static Eina_Bool    _forecasts_server_del(void *data, int type, void *event);
-static Eina_Bool    _forecasts_server_data(void *data, int type, void *event);
+static Eina_Bool    _forecasts_server_add(void *data, int type __UNUSED__, void *event);
+static Eina_Bool    _forecasts_server_del(void *data, int type __UNUSED__, void *event);
+static Eina_Bool    _forecasts_server_data(void *data, int type __UNUSED__, void *event);
 static int          _forecasts_parse(void *data);
 static int          _forecasts_parse_json(void *data);
 static void         _forecasts_converter(Instance *inst);
@@ -140,11 +139,11 @@ static void         _forecasts_convert_degrees(int *value, int dir);
 static void         _forecasts_convert_distances(int *value, int dir);
 static void         _forecasts_convert_distances_float(float *value, int dir);
 static void         _forecasts_convert_pressures(float *value, int dir);
-static void         _forecasts_display_set(Instance *inst, int ok);
+static void         _forecasts_display_set(Instance *inst, int ok __UNUSED__);
 static void         _forecasts_popup_content_create(Instance *inst);
-static void         _cb_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void         _cb_mouse_in(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void         _cb_mouse_out(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void         _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void         _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void         _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static Evas_Object *_forecasts_popup_icon_create(Evas *evas, int code);
 static void         _forecasts_popup_destroy(Instance *inst);
 static void         _right_values_update(Instance *inst);
@@ -268,13 +267,13 @@ _gc_orient(E_Gadcon_Client *gcc, E_Gadcon_Orient orient)
 }
 
 static const char *
-_gc_label(__UNUSED__ const E_Gadcon_Client_Class *client_class)
+_gc_label(const E_Gadcon_Client_Class *client_class __UNUSED__)
 {
    return D_("Forecasts");
 }
 
 static Evas_Object *
-_gc_icon(__UNUSED__ const E_Gadcon_Client_Class *client_class, Evas *evas)
+_gc_icon(const E_Gadcon_Client_Class *client_class __UNUSED__, Evas *evas)
 {
    Evas_Object *o;
    char buf[4096];
@@ -287,7 +286,7 @@ _gc_icon(__UNUSED__ const E_Gadcon_Client_Class *client_class, Evas *evas)
 }
 
 static const char *
-_gc_id_new(__UNUSED__ const E_Gadcon_Client_Class *client_class)
+_gc_id_new(const E_Gadcon_Client_Class *client_class __UNUSED__)
 {
    Config_Item *ci;
 
@@ -296,8 +295,8 @@ _gc_id_new(__UNUSED__ const E_Gadcon_Client_Class *client_class)
 }
 
 static void
-_forecasts_cb_mouse_down(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj,
-                         __UNUSED__ void *event_info)
+_forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+                         void *event_info __UNUSED__)
 {
    Instance *inst;
    Evas_Event_Mouse_Down *ev;
@@ -342,7 +341,7 @@ _forecasts_menu_cb_post(void *data, E_Menu *m)
 }*/
 
 static void
-_forecasts_menu_cb_configure(void *data, __UNUSED__  E_Menu *m, __UNUSED__  E_Menu_Item *mi)
+_forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)
 {
    Instance *inst;
 
@@ -466,7 +465,7 @@ e_modapi_init(E_Module *m)
 }
 
 EAPI int
-e_modapi_shutdown(__UNUSED__  E_Module *m)
+e_modapi_shutdown(E_Module *m __UNUSED__)
 {
    forecasts_config->module = NULL;
    e_gadcon_provider_unregister(&_gadcon_class);
@@ -507,7 +506,7 @@ e_modapi_shutdown(__UNUSED__  E_Module *m)
 }
 
 EAPI int
-e_modapi_save(__UNUSED__ E_Module *m)
+e_modapi_save(E_Module *m __UNUSED__)
 {
    e_config_domain_save("module.forecasts", conf_edd, forecasts_config);
    return 1;
@@ -579,7 +578,7 @@ _forecasts_cb_check(void *data)
 }
 
 static Eina_Bool
-_forecasts_server_add(void *data, __UNUSED__ int type, void *event)
+_forecasts_server_add(void *data, int type __UNUSED__, void *event)
 {
    Instance *inst;
    Ecore_Con_Event_Server_Add *ev;
@@ -609,7 +608,7 @@ _forecasts_server_add(void *data, __UNUSED__ int type, void *event)
 
 
 static Eina_Bool
-_forecasts_server_del(void *data, __UNUSED__  int type, void *event)
+_forecasts_server_del(void *data, int type __UNUSED__, void *event)
 {
    Instance *inst;
    Ecore_Con_Event_Server_Del *ev;
@@ -656,7 +655,7 @@ _forecasts_server_del(void *data, __UNUSED__  int type, void *event)
 }
 
 static Eina_Bool
-_forecasts_server_data(void *data, __UNUSED__  int type, void *event)
+_forecasts_server_data(void *data, int type __UNUSED__, void *event)
 {
    Instance *inst;
    Ecore_Con_Event_Server_Data *ev;
@@ -1040,7 +1039,7 @@ _right_values_update(Instance *inst)
 
 
 static void
-_forecasts_display_set(Instance *inst, __UNUSED__  int ok)
+_forecasts_display_set(Instance *inst, int ok __UNUSED__)
 {
    char buf[4096];
    char m[4096];
@@ -1285,7 +1284,7 @@ _forecasts_popup_destroy(Instance *inst)
 }
 
 static void
-_cb_mouse_down(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj, void *event_info)
+_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Instance *inst;
    Evas_Event_Mouse_Down *ev;
@@ -1307,7 +1306,7 @@ _cb_mouse_down(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj, void
 }
 
 static void
-_cb_mouse_in(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj, __UNUSED__ void *event_info)
+_cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Instance *inst;
 
@@ -1319,7 +1318,7 @@ _cb_mouse_in(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj, __UNUS
 }
 
 static void
-_cb_mouse_out(void *data, __UNUSED__ Evas *e, __UNUSED__ Evas_Object *obj, __UNUSED__ void *event_info)
+_cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Instance *inst;
 

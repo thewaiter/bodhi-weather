@@ -295,14 +295,14 @@ _gc_id_new(const E_Gadcon_Client_Class *client_class __UNUSED__)
 }
 
 static void
-_forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+_forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__)
 {
-   Instance *inst;
-   Evas_Event_Mouse_Down *ev;
+   EINA_SAFETY_ON_NULL_RETURN(data);
+   
+   Instance *inst = data;
+   Evas_Event_Mouse_Down *ev = event_info;
 
-   inst = data;
-   ev = event_info;
    if ((ev->button == 3)) // && (!forecasts_config->menu))  Segfault issue removal
      {
         E_Menu *m;
@@ -343,12 +343,13 @@ _forecasts_menu_cb_post(void *data, E_Menu *m)
 static void
 _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)
 {
-   Instance *inst;
+   EINA_SAFETY_ON_NULL_RETURN(data);
+   
+   Instance *inst = data;
 
    if (!forecasts_config) return;
    if (forecasts_config->config_dialog) return;
 
-   inst = data;
    _config_forecasts_module(inst->ci);
 }
 
@@ -562,12 +563,11 @@ _forecasts_free(Forecasts *w)
 static Eina_Bool
 _forecasts_cb_check(void *data)
 {
-   Instance *inst;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
    
-   /* check that data is valid */
-   if (!(inst = data)) return EINA_FALSE;
+   Instance *inst = data;
    
-    if (inst->server) ecore_con_server_del(inst->server);
+   if (inst->server) ecore_con_server_del(inst->server);
      inst->server = NULL;
 
    inst->server = ecore_con_server_connect(ECORE_CON_REMOTE_SYSTEM, inst->ci->host, 80, inst);
@@ -580,17 +580,14 @@ _forecasts_cb_check(void *data)
 static Eina_Bool
 _forecasts_server_add(void *data, int type __UNUSED__, void *event)
 {
-   Instance *inst;
-   Ecore_Con_Event_Server_Add *ev;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
+   
+   Instance *inst = data;
+   Ecore_Con_Event_Server_Add *ev = event;
    char buf[1024];
    char forecast[1024];
    int err_server;
-   
-   inst = data;
-   if (!inst)
-     return EINA_TRUE;
 
-   ev = event;
    if ((!inst->server) || (inst->server != ev->server))
      return EINA_TRUE;
 
@@ -610,21 +607,21 @@ _forecasts_server_add(void *data, int type __UNUSED__, void *event)
 static Eina_Bool
 _forecasts_server_del(void *data, int type __UNUSED__, void *event)
 {
-   Instance *inst;
-   Ecore_Con_Event_Server_Del *ev;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
+   
+   Instance *inst = data;
+   Ecore_Con_Event_Server_Del *ev = event;
    FILE *output;
    char line[256], buf[256], lang_buf[256] = "";
    int ret;
 
-   inst = data;
-   ev = event;
    if ((!inst->server) || (inst->server != ev->server))
      return EINA_TRUE;
 
    ecore_con_server_del(inst->server);
    inst->server = NULL;
 
-  if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
+   if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
    
    snprintf(buf, 256, "echo 'GET http://%swttr.in/%s?format=j1' | nc wttr.in 80", lang_buf, inst->ci->code);
       
@@ -657,11 +654,10 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
 static Eina_Bool
 _forecasts_server_data(void *data, int type __UNUSED__, void *event)
 {
-   Instance *inst;
-   Ecore_Con_Event_Server_Data *ev;
-
-   inst = data;
-   ev = event;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
+   
+   Instance *inst = data;
+   Ecore_Con_Event_Server_Data *ev = event;
 
    if ((!inst->server) || (inst->server != ev->server))
      return EINA_TRUE;
@@ -689,8 +685,10 @@ seek_text(char * string, const char * value, int jump)
 static int
 _forecasts_parse_json(void *data)
 {
-   Instance *inst;
-   inst = data;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, 0);
+   
+   Instance *inst = data;
+
    char *needle;
    char city[256];
    char region[256];
@@ -698,8 +696,6 @@ _forecasts_parse_json(void *data)
    float visibility;
    int have_lang = 0;
 
-   if (!inst)
-     return 0;
    if (!inst->buffer)
      return 0;
    
@@ -921,6 +917,8 @@ _forecasts_parse_json(void *data)
 void
 _forecasts_converter(Instance *inst)
 {
+   EINA_SAFETY_ON_NULL_RETURN(inst);
+
    int i, dir = -1;
 
    if (inst->ci->degrees == DEGREES_C)
@@ -1008,44 +1006,38 @@ _forecasts_convert_pressures(float *value, int dir)
 static void
 _right_values_update(Instance *inst)
 {
- char buf[4096], name[60];
-        int i;
-        for (i = 0; i < 2; i++)
-          {
-             Evas_Object *swallow;
-
-             snprintf(name, sizeof(name), "e.text.day%d.date", i);
-             edje_object_part_text_set(inst->forecasts->forecasts_obj, name, inst->forecast[i].date);
-
-             snprintf(name, sizeof(name), "e.text.day%d.description", i);
-             edje_object_part_text_set(inst->forecasts->forecasts_obj, name, inst->forecast[i].desc);
-
-             snprintf(name, sizeof(name), "e.text.day%d.high", i);
-             snprintf(buf, sizeof(buf), "%d °%c", inst->forecast[i].high, inst->units.temp);
-             edje_object_part_text_set(inst->forecasts->forecasts_obj, name, buf);
-
-             snprintf(name, sizeof(name), "e.text.day%d.low", i);
-             snprintf(buf, sizeof(buf), "%d °%c", inst->forecast[i].low, inst->units.temp);
-             edje_object_part_text_set(inst->forecasts->forecasts_obj, name, buf);
-
-             snprintf(name, sizeof(name), "e.swallow.day%d.icon", i);
-             swallow = edje_object_part_swallow_get(inst->forecasts->forecasts_obj, name);
-             if (swallow)
-               evas_object_del(swallow);
-             edje_object_part_swallow(inst->forecasts->forecasts_obj, name,
-                                      _forecasts_popup_icon_create(inst->gcc->gadcon->evas, inst->forecast[i].code));
-          }
+   char buf[4096], name[60];
+   int i;
+   for (i = 0; i < 2; i++)
+     {
+        Evas_Object *swallow;
+        snprintf(name, sizeof(name), "e.text.day%d.date", i);
+        edje_object_part_text_set(inst->forecasts->forecasts_obj, name, inst->forecast[i].date);
+        snprintf(name, sizeof(name), "e.text.day%d.description", i);
+        edje_object_part_text_set(inst->forecasts->forecasts_obj, name, inst->forecast[i].desc);
+        snprintf(name, sizeof(name), "e.text.day%d.high", i);
+        snprintf(buf, sizeof(buf), "%d °%c", inst->forecast[i].high, inst->units.temp);
+        edje_object_part_text_set(inst->forecasts->forecasts_obj, name, buf);
+        snprintf(name, sizeof(name), "e.text.day%d.low", i);
+        snprintf(buf, sizeof(buf), "%d °%c", inst->forecast[i].low, inst->units.temp);
+        edje_object_part_text_set(inst->forecasts->forecasts_obj, name, buf);
+        snprintf(name, sizeof(name), "e.swallow.day%d.icon", i);
+        swallow = edje_object_part_swallow_get(inst->forecasts->forecasts_obj, name);
+        if (swallow)
+          evas_object_del(swallow);
+        edje_object_part_swallow(inst->forecasts->forecasts_obj, name,
+                                 _forecasts_popup_icon_create(inst->gcc->gadcon->evas, inst->forecast[i].code));
+      }
 }
 
 
 static void
 _forecasts_display_set(Instance *inst, int ok __UNUSED__)
 {
+   EINA_SAFETY_ON_NULL_RETURN(inst);
+
    char buf[4096];
    char m[4096];
-
-   if (!inst)
-     return;
 
    snprintf(m, sizeof(m), "%s/forecasts.edj",
             e_module_dir_get(forecasts_config->module));
@@ -1135,6 +1127,8 @@ _forecasts_config_updated(Config_Item *ci)
 static void
 _forecasts_popup_content_create(Instance *inst)
 {
+   EINA_SAFETY_ON_NULL_RETURN(inst);
+
    Evas_Object *o, *ol, *of, *ob, *oi;
    Evas *evas;
    char buf[4096];
@@ -1279,6 +1273,8 @@ _forecasts_popup_icon_create(Evas *evas, int code)
 static void
 _forecasts_popup_destroy(Instance *inst)
 {
+   EINA_SAFETY_ON_NULL_RETURN(inst);
+
    if (!inst->popup) return;
    e_object_del(E_OBJECT(inst->popup));
 }
@@ -1286,10 +1282,10 @@ _forecasts_popup_destroy(Instance *inst)
 static void
 _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   Instance *inst;
-   Evas_Event_Mouse_Down *ev;
+   EINA_SAFETY_ON_NULL_RETURN(data);
 
-   if (!(inst = data)) return;
+   Instance *inst = data;
+   Evas_Event_Mouse_Down *ev = event_info;
 
    if (!inst->ci->popup_on_hover)
      {
@@ -1298,7 +1294,6 @@ _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
         return;
      }
 
-   ev = event_info;
    if (ev->button == 1)
      {
         e_gadcon_popup_toggle_pinned(inst->popup);
@@ -1308,9 +1303,9 @@ _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 static void
 _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Instance *inst;
-
-   if (!(inst = data)) return;
+   EINA_SAFETY_ON_NULL_RETURN(data);
+   
+   Instance *inst = data;
    if (!inst->ci->popup_on_hover) return;
 
    if (!inst->popup) _forecasts_popup_content_create(inst);
@@ -1320,9 +1315,9 @@ _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *
 static void
 _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Instance *inst;
-
-   if (!(inst = data)) return;
+   EINA_SAFETY_ON_NULL_RETURN(data);
+   
+   Instance *inst = data;
    if (!(inst->popup)) return;
 
    if (inst->popup->pinned) return;

@@ -132,7 +132,7 @@ static void         _forecasts_free(Forecasts *w);
 static Eina_Bool    _forecasts_server_add(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_del(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_data(void *data, int type __UNUSED__, void *event);
-static int          _forecasts_parse(void *data);
+//static int          _forecasts_parse(void *data);
 static int          _forecasts_parse_json(void *data);
 static void         _forecasts_converter(Instance *inst);
 static void         _forecasts_convert_degrees(int *value, int dir);
@@ -584,7 +584,7 @@ _forecasts_server_add(void *data, int type __UNUSED__, void *event)
    
    Instance *inst = data;
    Ecore_Con_Event_Server_Add *ev = event;
-   char buf[1024];
+   char buf[1114];
    char forecast[1024];
    int err_server;
 
@@ -612,7 +612,7 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    Instance *inst = data;
    Ecore_Con_Event_Server_Del *ev = event;
    FILE *output;
-   char line[256], buf[256], lang_buf[256] = "";
+   char line[256], buf[309], lang_buf[256] = "";
    int ret;
 
    if ((!inst->server) || (inst->server != ev->server))
@@ -623,7 +623,7 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
 
    if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
    
-   snprintf(buf, 256, "echo 'GET http://%swttr.in/%s?format=j1' | nc wttr.in 80", lang_buf, inst->ci->code);
+   snprintf(buf, 309, "echo 'GET http://%swttr.in/%s?format=j1' | nc wttr.in 80", lang_buf, inst->ci->code);
       
    output = popen(buf, "r");
    printf("buf: %s\n", buf);
@@ -692,7 +692,7 @@ _forecasts_parse_json(void *data)
    char *needle;
    char city[256];
    char region[256];
-   char location[512];
+   char location[513];
    float visibility;
    int have_lang = 0;
 
@@ -763,7 +763,7 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, "value", 0); 
    needle = seek_text(needle, ":", 3);
    sscanf(needle, "%255[^\"]\"", region);
-   snprintf(location, 512, "%s, %s", city, region);
+   snprintf(location, 513, "%s, %s", city, region);
    eina_stringshare_replace(&inst->location, location);
    
    needle = seek_text(needle, "sunrise", 0);

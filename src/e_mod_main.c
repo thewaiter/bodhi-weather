@@ -200,7 +200,7 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
  
    _forecasts_cb_check(inst);
    
-   printf("****************************** %f\n\n", inst->ci->poll_time);
+   INF("Poll time: %f", inst->ci->poll_time);
    inst->check_timer =
      ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
    return gcc;
@@ -574,7 +574,7 @@ _forecasts_cb_check(void *data)
    
    if (inst->server) ecore_con_server_del(inst->server);
    inst->server = NULL;
-   printf("Timer forecast_cb_check\n");
+   INF("Timer forecast_cb_check");
    inst->server = ecore_con_server_connect(ECORE_CON_REMOTE_SYSTEM, inst->ci->host, 80, inst);
  
    if (!inst->server) return EINA_FALSE;
@@ -627,8 +627,6 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    ecore_con_server_del(inst->server);
    inst->server = NULL;
  
-   
-   printf("Data Recieved\n");
    ret = _forecasts_parse_json(inst);
    _forecasts_converter(inst);
    _forecasts_display_set(inst, ret);
@@ -649,8 +647,7 @@ _forecasts_server_data(void *data, int type __UNUSED__, void *event)
      return EINA_TRUE;
    eina_strbuf_append_length(inst->buffer, ev->data, ev->size);
    
-   printf("Data \n %lu\n", sizeof(ev->data));
-   
+      
    return EINA_FALSE;
 }
  

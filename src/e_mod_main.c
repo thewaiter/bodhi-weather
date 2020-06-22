@@ -628,26 +628,6 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    inst->server = NULL;
  
    
-   /*snprintf(buf, 309, "echo 'GET http://%swttr.in/%s?format=j1' | nc wttr.in 80", lang_buf, inst->ci->code);
-     
-   output = popen(buf, "r");
-   printf("buf: %s\n", buf);
-    //~ output = fopen("/home/stefan/json_sk.txt", "r");
-     
-   if(output == NULL) {
-      perror("Error opening file");
-      return EINA_FALSE;
-   }
-   
-   while (fgets(line, 256, output) != NULL){
-      eina_strbuf_append(inst->buffer, line);
-   }
-   
-   pclose(output);
-   
-   //~ char *failure = strstr(eina_strbuf_string_get(inst->buffer), "failure");
-   //~ if (failure) return EINA_TRUE;*/
-   //printf("Data Recieved: \n\n %s\n", eina_strbuf_string_get(inst->buffer));
    printf("Data Recieved\n");
    ret = _forecasts_parse_json(inst);
    _forecasts_converter(inst);

@@ -10,6 +10,18 @@
 # define D_(string) (string)
 #endif
 
+/* EINA_LOG support macros and global */
+extern int _e_forecast_log_dom;
+#undef DBG
+#undef INF
+#undef WRN
+#undef ERR
+#undef CRI
+#define DBG(...)            EINA_LOG_DOM_DBG(_e_forecast_log_dom, __VA_ARGS__)
+#define INF(...)            EINA_LOG_DOM_INFO(_e_forecast_log_dom, __VA_ARGS__)
+#define WRN(...)            EINA_LOG_DOM_WARN(_e_forecast_log_dom, __VA_ARGS__)
+#define ERR(...)            EINA_LOG_DOM_ERR(_e_forecast_log_dom, __VA_ARGS__)
+#define CRI(...)            EINA_LOG_DOM_CRIT(_e_forecast_log_dom, __VA_ARGS__)
 
 #define DEGREES_F 0
 #define DEGREES_C 1

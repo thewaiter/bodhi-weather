@@ -12,10 +12,8 @@
 #define DEFAULT_CITY ""
 #define DEFAULT_LANG ""
  
-#define ENABLE_DEBUG 1
-#define DEBUG(f, ...) if (ENABLE_DEBUG) \
-    printf("[forecasts] "f "\n", __VA_ARGS__)
- 
+EINTERN int _e_forecast_log_dom = -1;
+
 /*Utility functions */
 Eina_Strbuf *url_normalize_str(const char* str);
  
@@ -461,7 +459,9 @@ e_modapi_init(E_Module *m)
         forecasts_config->items = eina_list_append(forecasts_config->items, ci);
      }
   // _forecasts_get_proxy();
- 
+   _e_forecast_log_dom = eina_log_domain_register("Forecast", EINA_COLOR_ORANGE);
+   eina_log_domain_level_set("Forecast", EINA_LOG_LEVEL_INFO);
+
    forecasts_config->module = m;
    e_gadcon_provider_register(&_gadcon_class);
    return m;
@@ -505,6 +505,9 @@ e_modapi_shutdown(E_Module *m __UNUSED__)
    E_FREE(forecasts_config);
    E_CONFIG_DD_FREE(conf_item_edd);
    E_CONFIG_DD_FREE(conf_edd);
+   
+    eina_log_domain_unregister(_e_forecast_log_dom);
+   _e_forecast_log_dom = -1;
    return 1;
 }
  
@@ -601,10 +604,7 @@ _forecasts_server_add(void *data, int type __UNUSED__, void *event)
                               "Host: %s\r\n"
                               "Connection: close\r\n\r\n",
              lang_buf, inst->ci->host, forecast,inst->ci->host);
-   //snprintf(buf, sizeof(buf), "%s", "GET http://wttr.in/Ladson, SC?format=j1");
-   DEBUG("Server: %s", buf);
    err_server=ecore_con_server_send(inst->server, buf, strlen(buf));
-   DEBUG("Server error: %d", err_server);  
  
    return EINA_FALSE;
 }
@@ -1142,7 +1142,6 @@ _forecasts_popup_content_create(Instance *inst)
  
    oi = _forecasts_popup_icon_create(inst->popup->win->evas, inst->condition.code);
    edje_object_size_max_get(oi, &w, &h);
-   DEBUG("Icon size %dx%d", w, h);
    if (w > 160) w = 160;  /* For now there is a limit to how big the icon should be */
    if (h > 160) h = 160;  /* In the future, the icon should be set from the theme, not part of the table */
    ob = e_widget_image_add_from_object(evas, oi, w, h);

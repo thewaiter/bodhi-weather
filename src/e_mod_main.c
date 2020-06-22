@@ -588,17 +588,19 @@ _forecasts_server_add(void *data, int type __UNUSED__, void *event)
    Ecore_Con_Event_Server_Add *ev = event;
    char buf[1114];
    char forecast[1024];
+   char lang_buf[256] = "";
    int err_server;
  
    if ((!inst->server) || (inst->server != ev->server))
      return EINA_TRUE;
+     
+   if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
+   snprintf(forecast, sizeof(forecast), "%s?format=j1", inst->ci->code);
  
-   snprintf(forecast, sizeof(forecast), "?format=j1");
- 
-   snprintf(buf, sizeof(buf), "GET http://%s/%s HTTP/1.1\r\n"
+   snprintf(buf, sizeof(buf), "GET http://%s%s/%s HTTP/1.1\r\n"
                               "Host: %s\r\n"
                               "Connection: close\r\n\r\n",
-             inst->ci->host, forecast,inst->ci->host);
+             lang_buf, inst->ci->host, forecast,inst->ci->host);
    //snprintf(buf, sizeof(buf), "%s", "GET http://wttr.in/Ladson, SC?format=j1");
    DEBUG("Server: %s", buf);
    err_server=ecore_con_server_send(inst->server, buf, strlen(buf));
@@ -616,7 +618,7 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    Instance *inst = data;
    Ecore_Con_Event_Server_Del *ev = event;
    FILE *output;
-   char line[256], buf[309], lang_buf[256] = "";
+   char line[256];
    int ret;
  
    if ((!inst->server) || (inst->server != ev->server))
@@ -625,7 +627,6 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    ecore_con_server_del(inst->server);
    inst->server = NULL;
  
-   if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
    
    /*snprintf(buf, 309, "echo 'GET http://%swttr.in/%s?format=j1' | nc wttr.in 80", lang_buf, inst->ci->code);
      
@@ -711,7 +712,7 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, ":", 3);
    sscanf(needle, "%d\"", &inst->details.atmosphere.humidity);
    
-   /*if (inst->ci->lang[0] != '\0')
+   if (inst->ci->lang[0] != '\0')
    {
      needle = seek_text(needle, "lang", 0);
      needle = seek_text(needle, "value",0);
@@ -721,7 +722,7 @@ _forecasts_parse_json(void *data)
         have_lang = 1;
       }
       else have_lang = 0;
-   } */
+   }
    
    needle = seek_text(needle, "localObsDateTime", 0);
    needle = seek_text(needle, ":", 3);

@@ -141,14 +141,13 @@ static void         _forecasts_free(Forecasts *w);
 static Eina_Bool    _forecasts_server_add(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_del(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_data(void *data, int type __UNUSED__, void *event);
-//static int          _forecasts_parse(void *data);
-static int          _forecasts_parse_json(void *data);
+static Eina_Bool    _forecasts_parse_json(void *data);
 static void         _forecasts_converter(Instance *inst);
 static void         _forecasts_convert_degrees(int *value, int dir);
 static void         _forecasts_convert_distances(int *value, int dir);
 static void         _forecasts_convert_distances_float(float *value, int dir);
 static void         _forecasts_convert_pressures(float *value, int dir);
-static void         _forecasts_display_set(Instance *inst, int ok __UNUSED__);
+static void         _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__);
 static void         _forecasts_popup_content_create(Instance *inst);
 static void         _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void         _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
@@ -630,7 +629,7 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    Ecore_Con_Event_Server_Del *ev = event;
    FILE *output;
    char line[256];
-   int ret;
+   Eina_Bool ret;
  
    if ((!inst->server) || (inst->server != ev->server))
      return EINA_TRUE;
@@ -679,7 +678,7 @@ seek_text(char * string, const char * value, int jump)
  
 }
  
-static int
+static Eina_Bool
 _forecasts_parse_json(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, 0);
@@ -1081,7 +1080,7 @@ _right_values_update(Instance *inst)
  
  
 static void
-_forecasts_display_set(Instance *inst, int ok __UNUSED__)
+_forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  

@@ -42,8 +42,8 @@ _config_forecasts_module(Config_Item *ci)
    //~ snprintf(buf, sizeof(buf), "%s/module.edj",
             //~ e_module_dir_get(forecasts_config->module));
    con = e_container_current_get(e_manager_current_get());
-   cfd =
-     e_config_dialog_new(con, D_("Forecasts Settings"), "Forecasts", "_e_modules_forecasts_config_dialog", "preferences-system", 0, v, ci);
+   cfd = e_config_dialog_new(con, D_("Forecasts Settings"), "Forecasts", 
+         "_e_modules_forecasts_config_dialog", "preferences-system", 0, v, ci);
    forecasts_config->config_dialog = cfd;
 }
 

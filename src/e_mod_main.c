@@ -107,6 +107,7 @@ struct _Instance
  
    Eina_Strbuf    *buffer;
    const char     *location;
+   const char     *country;
    const char     *language;
    const char     *area;
  
@@ -688,6 +689,7 @@ _forecasts_parse_json(void *data)
    char *needle;
    char city[256];
    char region[256];
+   char country[256];
    char location[513];
    float visibility;
    int have_lang = 0;
@@ -781,9 +783,21 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, "value", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("country");
+   sscanf(needle, "%255[^\"]\"", country);
+   
+   needle = seek_text(needle, "region", 0);
+   needle = seek_text(needle, "value", 0);
+   needle = seek_text(needle, ":", 3);
+   PARSER_TEST("region");
    sscanf(needle, "%255[^\"]\"", region);
-   snprintf(location, 513, "%s, %s", city, region); // TODO: does this also need protection
+   
+   if (strcmp(city, region) == 0)
+       snprintf(location, 513, "%s", city); 
+   else
+       snprintf(location, 513, "%s, %s", city, region); 
+       
    eina_stringshare_replace(&inst->location, location);
+   eina_stringshare_replace(&inst->country, country);
    
    needle = seek_text(needle, "sunrise", 0);
    needle = seek_text(needle, ":", 3);
@@ -1108,6 +1122,7 @@ _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.description",
                              inst->condition.desc);
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.location", inst->location);
+   edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.country", inst->country);
  
    if (inst->gcc->gadcon->orient == E_GADCON_ORIENT_FLOAT)
       _right_values_update(inst); //Updating right two icons description

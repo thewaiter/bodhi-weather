@@ -695,7 +695,10 @@ _forecasts_parse_json(void *data)
    if (!inst->buffer)
      return 0;
    
-   needle = strstr(eina_strbuf_string_get(inst->buffer), "humidity");
+   needle = (char *) eina_strbuf_string_get(inst->buffer);
+   if (needle[0] == '\0') return EINA_FALSE;
+   
+   needle = seek_text(needle, "humidity", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("humidity");
    sscanf(needle, "%d\"", &inst->details.atmosphere.humidity);
@@ -924,7 +927,7 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, "weatherCode", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("weatherCode");
-   sscanf(needle, "%d\"", &inst->forecast[1].code);
+   sscanf(needle, "%d\"", &inst->forecast[2].code);
  
     if (!have_lang)
    {

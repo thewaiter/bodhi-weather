@@ -148,11 +148,6 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
    Config_Item *ci;
 
    ci = cfd->data;
-   //~ if (!cfdata->code)
-     //~ return 0;
-
-   //~ if (!strlen(cfdata->code))
-     //~ return 0;
 
    ci->degrees = cfdata->degrees;
    ci->poll_time = (cfdata->poll_time * 60.0);

@@ -88,7 +88,8 @@ struct _Instance
       struct
       {
          int   humidity, rising;
-         float pressure, visibility;
+         float pressure, pressure_km, pressure_mi; 
+         float visibility, visibility_km, visibility_mi;
       } atmosphere;
  
       struct
@@ -729,6 +730,7 @@ _forecasts_parse_json(void *data)
    char country[256];
    char location[513];
    float visibility;
+   float pressure;
    int have_lang = 0;
  
    if (!inst->buffer)
@@ -767,9 +769,11 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, "pressure", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("pressure");
-   sscanf(needle, "%f\"", &inst->details.atmosphere.pressure);
-   inst->details.atmosphere.pressure /= MB_TO_IN;
- 
+   sscanf(needle, "%f\"", &pressure);
+   
+   inst->details.atmosphere.pressure_km = pressure;
+   inst->details.atmosphere.pressure_mi = pressure * MB_TO_IN;
+   
    needle = seek_text(needle, "temp_C", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("temp_C");
@@ -784,7 +788,8 @@ _forecasts_parse_json(void *data)
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("visibility");
    sscanf(needle, "%f\"", &visibility);
-   inst->details.atmosphere.visibility = visibility;
+   inst->details.atmosphere.visibility_km = visibility;
+   inst->details.atmosphere.visibility_mi = visibility * KM_TO_MI;
    
    needle = seek_text(needle, "weatherCode", 0);
    needle = seek_text(needle, ":", 3);
@@ -1021,11 +1026,10 @@ _forecasts_converter(Instance *inst)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  
-   int i, dir = -1;
+   int i;
  
    if (inst->ci->degrees == DEGREES_C)
      {
-        dir = DEGREES_C;
         inst->units.temp = 'C';
         snprintf(inst->units.distance, 3, "km");
         snprintf(inst->units.pressure, 3, "mb");
@@ -1034,8 +1038,10 @@ _forecasts_converter(Instance *inst)
         inst->condition.temp = inst->condition.temp_c;
         inst->details.wind.speed = inst->details.wind.speed_km;
         inst->details.wind.chill = inst->details.wind.chill_c;
+        inst->details.atmosphere.visibility = inst->details.atmosphere.visibility_km;
+        inst->details.atmosphere.pressure = inst->details.atmosphere.pressure_km;
        
-        for (i = 0; i < inst->ci->days / 5; i++)
+        for (i = 0; i <= 2 ; i++)
          {
             inst->forecast[i].low = inst->forecast[i].low_c;
             inst->forecast[i].high = inst->forecast[i].high_c;
@@ -1043,7 +1049,6 @@ _forecasts_converter(Instance *inst)
      }
     else
      {
-        dir = DEGREES_F;
         inst->units.temp = 'F';
         snprintf(inst->units.distance, 3, "mi");
         snprintf(inst->units.pressure, 3, "in");
@@ -1052,59 +1057,17 @@ _forecasts_converter(Instance *inst)
         inst->condition.temp = inst->condition.temp_f;
         inst->details.wind.speed = inst->details.wind.speed_mi;
         inst->details.wind.chill = inst->details.wind.chill_f;
-       
-        for (i = 0; i < inst->ci->days / 5; i++)
+        inst->details.atmosphere.visibility = inst->details.atmosphere.visibility_mi;
+        inst->details.atmosphere.pressure = inst->details.atmosphere.pressure_mi;
+        
+        for (i = 0; i <= 2; i++)
          {
             inst->forecast[i].low = inst->forecast[i].low_f;
             inst->forecast[i].high = inst->forecast[i].high_f;
           }
      }
-   if (dir == -1) return;
- 
-   //~ _forecasts_convert_degrees(&inst->condition.temp, dir);
-   //~ _forecasts_convert_degrees(&inst->details.wind.chill, dir);
-   //~ _forecasts_convert_distances(&inst->details.wind.speed, dir);
-   _forecasts_convert_distances_float(&inst->details.atmosphere.visibility, dir);
-   //~ _forecasts_convert_pressures(&inst->details.atmosphere.pressure, dir);
-   
 }
- 
-static void
-_forecasts_convert_degrees(int *value, int dir)
-{
-   if ((dir == DEGREES_F))
-     *value = (*value - 32) * 5.0 / 9.0;
-   else
-     *value = (*value * 9.0 / 5.0) + 32;
-}
- 
-static void
-_forecasts_convert_distances(int *value, int dir)
-{
-   if ((dir == DEGREES_C))
-     *value = (*value) * KM_TO_MI;
-   else
-     *value = (*value) / KM_TO_MI;
-}
- 
-static void
-_forecasts_convert_distances_float(float *value, int dir)
-{
-   if ((dir == DEGREES_C))
-     *value = (*value) * KM_TO_MI;
-   else
-     *value = (*value) / KM_TO_MI;
-}
- 
-static void
-_forecasts_convert_pressures(float *value, int dir)
-{
-   if ((dir != DEGREES_C))
-     *value = (*value) * MB_TO_IN;
-   else
-     *value = (*value) / MB_TO_IN;
-}
- 
+
 static void
 _right_values_update(Instance *inst)
 {
@@ -1284,7 +1247,7 @@ _forecasts_popup_content_create(Instance *inst)
  
    ob = e_widget_label_add(evas, D_("Pressure"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
-   snprintf(buf, sizeof(buf), "%.2f %s", inst->details.atmosphere.pressure, inst->units.pressure);
+   snprintf(buf, sizeof(buf), "%.0f %s", inst->details.atmosphere.pressure, inst->units.pressure);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  

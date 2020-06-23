@@ -139,6 +139,7 @@ static Eina_Bool    _forecasts_cb_check(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
+static void         _forecasts_get_proxy(void);
 static Eina_Bool    _forecasts_server_add(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_del(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_data(void *data, int type __UNUSED__, void *event);
@@ -469,7 +470,7 @@ e_modapi_init(E_Module *m)
  
         forecasts_config->items = eina_list_append(forecasts_config->items, ci);
      }
-  // _forecasts_get_proxy();
+   _forecasts_get_proxy();
    _e_forecast_log_dom = eina_log_domain_register("Forecast", EINA_COLOR_ORANGE);
    eina_log_domain_level_set("Forecast", EINA_LOG_LEVEL_INFO);
 
@@ -575,6 +576,35 @@ _forecasts_free(Forecasts *w)
    free(w);
    w = NULL;
 }
+
+static void
+_forecasts_get_proxy(void)
+{
+   const char *env;
+   const char *host = NULL;
+   const char *p;
+   int port = 0;
+
+   env = getenv("http_proxy");
+   if ((!env) || (!*env)) env = getenv("HTTP_PROXY");
+   if ((!env) || (!*env)) return;
+   if (strncmp(env, "http://", 7)) return;
+
+   host = strchr(env, ':');
+   host += 3;
+   p = strchr(host, ':');
+   if (p)
+     {
+        if (sscanf(p + 1, "%d", &port) != 1)
+          port = 0;
+     }
+   if ((host) && (port))
+     {
+        if (proxy.host) eina_stringshare_del(proxy.host);
+        proxy.host = eina_stringshare_add_length(host, p - host);
+        proxy.port = port;
+     }
+}
  
 static Eina_Bool
 _forecasts_cb_check(void *data)
@@ -586,7 +616,14 @@ _forecasts_cb_check(void *data)
    if (inst->server) ecore_con_server_del(inst->server);
    inst->server = NULL;
    INF("Timer forecast_cb_check");
-   inst->server = ecore_con_server_connect(ECORE_CON_REMOTE_SYSTEM, inst->ci->host, 80, inst);
+   
+   if (proxy.port != 0)
+   inst->server =
+       ecore_con_server_connect(ECORE_CON_REMOTE_NODELAY,
+                                proxy.host, proxy.port, inst);
+   else
+     inst->server =
+       ecore_con_server_connect(ECORE_CON_REMOTE_NODELAY, inst->ci->host, 80, inst);
  
    if (!inst->server) return EINA_FALSE;
  

@@ -399,7 +399,7 @@ _forecasts_config_item_get(const char *id)
  
    ci = E_NEW(Config_Item, 1);
    ci->id = eina_stringshare_add(id);
-   ci->poll_time = 60.0;
+   ci->poll_time = 3600.0;
    ci->days = 15.0;
    ci->degrees = DEGREES_C;
    ci->host = eina_stringshare_add("wttr.in");
@@ -457,7 +457,7 @@ e_modapi_init(E_Module *m)
         forecasts_config = E_NEW(Config, 1);
         ci = E_NEW(Config_Item, 1);
         ci->id = eina_stringshare_add("0");
-        ci->poll_time = 60.0;
+        ci->poll_time = 3600.0;
         ci->days = 15.0;
         ci->degrees = DEGREES_C;
         ci->host = eina_stringshare_add("wttr.in");

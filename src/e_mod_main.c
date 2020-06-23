@@ -212,7 +212,7 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    
    INF("Poll time: %f", inst->ci->poll_time);
    inst->check_timer =
-     ecore_timer_add(inst->ci->poll_time * 60, _forecasts_cb_check, inst);
+     ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
    return gcc;
 }
  
@@ -1166,11 +1166,11 @@ _forecasts_config_updated(Config_Item *ci)
  
         if (!inst->check_timer)
           inst->check_timer =
-            ecore_timer_add(inst->ci->poll_time * 60, _forecasts_cb_check,
+            ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check,
                             inst);
         else
           ecore_timer_interval_set(inst->check_timer,
-                                   inst->ci->poll_time * 60);
+                                   inst->ci->poll_time);
  
      }
 }

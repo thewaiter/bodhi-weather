@@ -10,6 +10,7 @@ struct _E_Config_Dialog_Data
    int    degrees;
    char  *code;
    char  *lang;
+   char  *label;
    int    show_text;
    int    popup_on_hover;
 };
@@ -57,6 +58,8 @@ _fill_data(Config_Item *ci, E_Config_Dialog_Data *cfdata)
      cfdata->code = strdup(ci->code);
    if (ci->lang)
      cfdata->lang = strdup(ci->lang);
+   if (ci->label)
+     cfdata->label = strdup(ci->label);
    cfdata->show_text = ci->show_text;
    cfdata->popup_on_hover = ci->popup_on_hover;
 }
@@ -100,6 +103,7 @@ _basic_create_widgets(E_Config_Dialog *cfd __UNUSED__, Evas *evas,
    ob = e_widget_slider_add(evas, 1, 0, D_("%2.0f minutes"), 15.0, 60.0, 1.0, 0,&(cfdata->poll_time), NULL, 40);
    e_widget_framelist_object_append(of, ob);
    
+   
    ob = e_widget_label_add(evas, D_("Forecasts days"));
    e_widget_framelist_object_append(of, ob);
    ob = e_widget_slider_add(evas, 1, 0, D_("%2.0f days"), 2.0, 3.0, 1.0, 0, &(cfdata->days), NULL, 40);
@@ -121,11 +125,17 @@ _basic_create_widgets(E_Config_Dialog *cfd __UNUSED__, Evas *evas,
 
    of = e_widget_frametable_add(evas, D_("Weather location"), 0);
    
-   ob = e_widget_label_add(evas, D_("City name (empty=current): "));
+   ob = e_widget_label_add(evas, D_("City name (empty = local): "));
    e_widget_frametable_object_append(of, ob, 0, 3, 1, 1, 1, 0, 1, 0);
    ob = e_widget_entry_add(evas, &cfdata->code, NULL, NULL, NULL);
    e_widget_size_min_set(ob, 120, 28);
    e_widget_frametable_object_append(of, ob, 1, 3, 1, 1, 1, 0, 1, 0);
+   
+   ob = e_widget_label_add(evas, D_("Custom location label: "));
+   e_widget_frametable_object_append(of, ob, 0, 4, 1, 1, 1, 0, 1, 0);
+   ob = e_widget_entry_add(evas, &cfdata->label, NULL, NULL, NULL);
+   e_widget_size_min_set(ob, 120, 28);
+   e_widget_frametable_object_append(of, ob, 1, 4, 1, 1, 1, 0, 1, 0);
    
    e_widget_list_object_append(o, of, 1, 1, 0.5);
    
@@ -165,6 +175,11 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
    l = strdup(cfdata->lang);
    *l = tolower(*l);
    ci->lang = eina_stringshare_add(l);
+
+   char *k;
+   k = strdup(cfdata->label);
+   //~ *k = tolower(*l);
+   ci->label = eina_stringshare_add(k);
    
   
    ci->show_text = cfdata->show_text;

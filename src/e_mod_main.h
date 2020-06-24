@@ -49,7 +49,7 @@ struct _Config_Item
    double poll_time;
    double days;
    int degrees;
-   const char *host, *code, *lang;
+   const char *host, *code, *lang, *label;
    int show_text;
    int popup_on_hover;
 };

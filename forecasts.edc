@@ -248,7 +248,7 @@ collections {
 		   color3: 0 0 0 32;
 		   color_class: "module_label";
 		   text {
-		       text:  "Country";
+		       text:  "";
 		       font:  "Sans:style=Bold";
 		       size:  10;
 		       min:   1 1;

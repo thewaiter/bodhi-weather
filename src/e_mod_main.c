@@ -110,6 +110,7 @@ struct _Instance
    const char     *location;
    const char     *country;
    const char     *language;
+   const char     *label;
    const char     *area;
  
    E_Gadcon_Popup *popup;
@@ -173,6 +174,7 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    inst->ci = _forecasts_config_item_get(id);
    inst->area = eina_stringshare_add(inst->ci->code);
    inst->language = eina_stringshare_add(inst->ci->lang);
+   inst->label = eina_stringshare_add(inst->ci->label);
    inst->buffer = eina_strbuf_new();
  
    w = _forecasts_new(gc->evas);
@@ -243,6 +245,8 @@ _gc_shutdown(E_Gadcon_Client *gcc)
      eina_stringshare_del(inst->area);
    if (inst->language)
      eina_stringshare_del(inst->language);
+   if (inst->label)
+     eina_stringshare_del(inst->label);
    eina_strbuf_free(inst->buffer);
  
    inst->server = NULL;
@@ -408,6 +412,7 @@ _forecasts_config_item_get(const char *id)
    ci->host = eina_stringshare_add("wttr.in");
    ci->code = eina_stringshare_add(DEFAULT_CITY);
    ci->lang = eina_stringshare_add(DEFAULT_LANG);
+   ci->label = eina_stringshare_add("");
    ci->show_text = 1;
    ci->popup_on_hover = 1;
  
@@ -442,6 +447,7 @@ e_modapi_init(E_Module *m)
    E_CONFIG_VAL(D, T, host, STR);
    E_CONFIG_VAL(D, T, code, STR);
    E_CONFIG_VAL(D, T, lang, STR);
+   E_CONFIG_VAL(D, T, label, STR);
    E_CONFIG_VAL(D, T, show_text, INT);
    E_CONFIG_VAL(D, T, popup_on_hover, INT);
  
@@ -466,6 +472,7 @@ e_modapi_init(E_Module *m)
         ci->host = eina_stringshare_add("wttr.in");
         ci->code = eina_stringshare_add(DEFAULT_CITY);
         ci->lang = eina_stringshare_add(DEFAULT_LANG);
+        ci->label = eina_stringshare_add("");
         ci->show_text = 1;
         ci->popup_on_hover = 1;
  
@@ -1121,9 +1128,17 @@ _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.temp", buf);
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.description",
                              inst->condition.desc);
-   edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.location", inst->location);
-   edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.country", inst->country);
- 
+   if (inst->ci->label[0] == '\0')
+   { 
+     edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.location", inst->location);
+     edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.country", inst->country);
+   }
+   else
+   { 
+     edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.location", inst->label);
+     edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.country", "");
+   }
+   
    if (inst->gcc->gadcon->orient == E_GADCON_ORIENT_FLOAT)
       _right_values_update(inst); //Updating right two icons description
  
@@ -1152,12 +1167,14 @@ _forecasts_config_updated(Config_Item *ci)
           area_changed = 1;
         if (inst->area) eina_stringshare_del(inst->area);
         inst->area = eina_stringshare_add(inst->ci->code);
-       
  
         if (inst->language && strcmp(inst->language, inst->ci->lang))
           lang_changed = 1;
         if (inst->language) eina_stringshare_del(inst->language);
         inst->language = eina_stringshare_add(inst->ci->lang);
+        
+        if (inst->label) eina_stringshare_del(inst->label);
+        inst->label = eina_stringshare_add(inst->ci->label);
        
         _forecasts_converter(inst);
        
@@ -1172,6 +1189,7 @@ _forecasts_config_updated(Config_Item *ci)
         else
           edje_object_signal_emit(inst->forecasts_obj, "e,state,description,show", "e");
  
+        _forecasts_display_set(inst, 1);
         //Updating right two icons description
         _right_values_update(inst);
        

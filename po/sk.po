@@ -14,10 +14,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: src/e_mod_config.c:46
 msgid "Forecasts Settings"
-msgstr "Nastavenie predpovede"
+msgstr "Nastavenie"
 
 #: src/e_mod_config.c:100
 msgid "Display Settings"
@@ -25,7 +26,7 @@ msgstr "Nastavenia zobrazovania"
 
 #: src/e_mod_config.c:101
 msgid "Poll Time"
-msgstr "Čas zisťovania"
+msgstr "Čas obnovy"
 
 #: src/e_mod_config.c:103
 #, c-format
@@ -37,9 +38,11 @@ msgid "Forecasts days"
 msgstr "Počet dní predpovede"
 
 #: src/e_mod_config.c:109
-#, fuzzy, c-format
 msgid "%2.0f days"
-msgstr "%2.0f"
+msgid_plural "%2.0f days"
+msgstr[0] "%u deň"
+msgstr[1] "%u dni"
+msgstr[2] "%u dní"
 
 #: src/e_mod_config.c:112
 msgid "Show Description"
@@ -63,23 +66,23 @@ msgstr "Britské"
 
 #: src/e_mod_config.c:126
 msgid "Weather location"
-msgstr ""
+msgstr "Miesto predpovede"
 
 #: src/e_mod_config.c:128
 msgid "City name (empty = local): "
-msgstr ""
+msgstr "Miesto (prázdne = lokálne)"
 
 #: src/e_mod_config.c:134
 msgid "Custom location label: "
-msgstr ""
+msgstr "Voliteľný názov polohy"
 
 #: src/e_mod_config.c:142
 msgid "Language support"
-msgstr ""
+msgstr "Jazyková podpora"
 
 #: src/e_mod_config.c:144
 msgid "Language code (e.g. sk):    "
-msgstr ""
+msgstr "Kód jazyka (napr. sk)"
 
 #: src/e_mod_main.c:290
 msgid "Forecasts"
@@ -95,38 +98,32 @@ msgid "%s: Current Conditions"
 msgstr "%s: Aktuálne počasie"
 
 #: src/e_mod_main.c:1248
-#, fuzzy
 msgid "Wind Chill:"
 msgstr "Chladnosť vetra"
 
 #: src/e_mod_main.c:1254
-#, fuzzy
 msgid "Wind Speed:"
 msgstr "Rýchlosť vetra"
 
 #: src/e_mod_main.c:1260
-#, fuzzy
 msgid "Humidity:"
 msgstr "Vlhkosť"
 
 #: src/e_mod_main.c:1266
 msgid "Precipitation:"
-msgstr ""
+msgstr "Úhrn zrážok"
 
 #: src/e_mod_main.c:1272
-#, fuzzy
 msgid "Visibility:"
 msgstr "Viditeľnosť"
 
 #: src/e_mod_main.c:1278
-#, fuzzy
 msgid "Pressure:"
 msgstr "Tlak"
 
 #: src/e_mod_main.c:1296
-#, fuzzy
 msgid "Sunrise / Sunset: "
-msgstr "Východ/západ slnka"
+msgstr "Východ / západ slnka"
 
 #: src/e_mod_main.c:1314
 msgid "Today"
@@ -138,47 +135,9 @@ msgstr "Zajtra"
 
 #: src/e_mod_main.c:1324
 msgid "High"
-msgstr "Vysoká"
+msgstr "Najvyššia"
 
 #: src/e_mod_main.c:1335
 msgid "Low"
-msgstr "Nízka"
+msgstr "Najnižšia"
 
-#~ msgid "GeoPlanet WOEID (Where on Earth Identifier)"
-#~ msgstr "GeoPlanet WOEID kód (Where on Earth Identifier)"
-
-#~ msgid "Code"
-#~ msgstr "Podľa kódu"
-
-#~ msgid "City name"
-#~ msgstr "Podľa miesta"
-
-#~ msgid "Forecasts WOEID Code or city name: "
-#~ msgstr "WOEID kód alebo miesto"
-
-#~ msgid "To find the code, go to:"
-#~ msgstr "Ak chcete nájsť kód pre svoju oblasť, choďte na:"
-
-#~ msgid "Rising"
-#~ msgstr "Stúpa"
-
-#~ msgid "Falling"
-#~ msgstr "Klesá"
-
-#~ msgid "Steady"
-#~ msgstr "Stabilná"
-
-#~ msgid "Forecasts Configuration"
-#~ msgstr "Nastavenia predpovedí"
-
-#~ msgid "Yahoo Forecasts Code"
-#~ msgstr "Kód predpovede Yahoo"
-
-#~ msgid "Yahoo Forecasts Code/US Zip Code"
-#~ msgstr "Kód predpovedí Yahoo/smerové číslo v USA"
-
-#~ msgid "%s, find your area, and look at the URL"
-#~ msgstr "%s, nájdite svoju oblasť a pozrite sa na URL"
-
-#~ msgid "Configuration"
-#~ msgstr "Nastavenie"

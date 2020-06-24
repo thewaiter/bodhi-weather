@@ -90,6 +90,7 @@ struct _Instance
          int   humidity, rising;
          float pressure, pressure_km, pressure_mi; 
          float visibility, visibility_km, visibility_mi;
+         float precip;
       } atmosphere;
  
       struct
@@ -773,6 +774,11 @@ _forecasts_parse_json(void *data)
    PARSER_TEST("localObsDateTime");
    sscanf(needle, "%51[^\"]\"", inst->condition.update);
    
+   needle = seek_text(needle, "precipMM", 0);
+   needle = seek_text(needle, ":", 3);
+   PARSER_TEST("precipMM");
+   sscanf(needle, "%f\"", &inst->details.atmosphere.precip);
+   
    needle = seek_text(needle, "pressure", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("pressure");
@@ -1239,31 +1245,37 @@ _forecasts_popup_content_create(Instance *inst)
    ob = e_widget_image_add_from_object(evas, oi, w, h);
    e_widget_frametable_object_append(of, ob, 2, row, 1, 2, 1, 0, 1, 1);
  
-   ob = e_widget_label_add(evas, D_("Wind Chill"));
+   ob = e_widget_label_add(evas, D_("Wind Chill:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    snprintf(buf, sizeof(buf), "%d °%c", inst->details.wind.chill, inst->units.temp);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  
-   ob = e_widget_label_add(evas, D_("Wind Speed"));
+   ob = e_widget_label_add(evas, D_("Wind Speed:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    snprintf(buf, sizeof(buf), "%d %s", inst->details.wind.speed, inst->units.speed);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  
-   ob = e_widget_label_add(evas, D_("Humidity"));
+   ob = e_widget_label_add(evas, D_("Humidity:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    snprintf(buf, sizeof(buf), "%d %%", inst->details.atmosphere.humidity);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
+   
+   ob = e_widget_label_add(evas, D_("Precipitation:"));
+   e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
+   snprintf(buf, sizeof(buf), "%.1f mm", inst->details.atmosphere.precip);
+   ob = e_widget_label_add(evas, buf);
+   e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  
-   ob = e_widget_label_add(evas, D_("Visibility"));
+   ob = e_widget_label_add(evas, D_("Visibility:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    snprintf(buf, sizeof(buf), "%.2f %s", inst->details.atmosphere.visibility, inst->units.distance);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  
-   ob = e_widget_label_add(evas, D_("Pressure"));
+   ob = e_widget_label_add(evas, D_("Pressure:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    if (inst->ci->degrees == DEGREES_C)
       snprintf(buf, sizeof(buf), "%.0f %s", inst->details.atmosphere.pressure, inst->units.pressure);
@@ -1281,7 +1293,7 @@ _forecasts_popup_content_create(Instance *inst)
    //~ ob = e_widget_label_add(evas, buf);
    //~ e_widget_frametable_object_append(of, ob, 2, row, 1, 1, 1, 0, 1, 0);
  
-   ob = e_widget_label_add(evas, D_("Sunrise / Sunset"));
+   ob = e_widget_label_add(evas, D_("Sunrise / Sunset: "));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
    snprintf(buf, sizeof(buf), "%s", inst->details.astronomy.sunrise);
    ob = e_widget_label_add(evas, buf);

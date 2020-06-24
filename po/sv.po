@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: forecasts E17\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-15 16:39+0200\n"
+"POT-Creation-Date: 2020-06-24 18:23+0200\n"
 "PO-Revision-Date: 2009-01-10 12:15+0000\n"
 "Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
 "Language-Team: Swedish\n"
@@ -22,136 +22,150 @@ msgstr ""
 msgid "Forecasts Settings"
 msgstr "Prognoser"
 
-#: src/e_mod_config.c:98
+#: src/e_mod_config.c:100
 msgid "Display Settings"
 msgstr "Visningsinställningar"
 
-#: src/e_mod_config.c:99
+#: src/e_mod_config.c:101
 msgid "Poll Time"
 msgstr "Uppdateringsintervall"
 
-#: src/e_mod_config.c:101
+#: src/e_mod_config.c:103
 #, c-format
 msgid "%2.0f minutes"
 msgstr "%2.0f minuter"
 
-#: src/e_mod_config.c:104
+#: src/e_mod_config.c:107
 #, fuzzy
 msgid "Forecasts days"
 msgstr "Prognoser"
 
-#: src/e_mod_config.c:106
-#, c-format
-msgid "%2.0f"
-msgstr ""
-
 #: src/e_mod_config.c:109
+#, fuzzy, c-format
+msgid "%2.0f days"
+msgstr "%2.0f minuter"
+
+#: src/e_mod_config.c:112
 msgid "Show Description"
 msgstr "Visa beskrivning"
 
-#: src/e_mod_config.c:111
+#: src/e_mod_config.c:114
 msgid "Popup on mouse over"
 msgstr "Popup vid muspekare"
 
-#: src/e_mod_config.c:115
+#: src/e_mod_config.c:118
 msgid "Unit Settings"
 msgstr "Enhetsinställningar"
 
-#: src/e_mod_config.c:117
+#: src/e_mod_config.c:120
 msgid "Metric"
 msgstr "Metriskt"
 
-#: src/e_mod_config.c:119
+#: src/e_mod_config.c:122
 msgid "English"
 msgstr "Engelska"
 
-#: src/e_mod_config.c:124
-msgid "GeoPlanet WOEID (Where on Earth Identifier)"
-msgstr ""
-
-#: src/e_mod_config.c:127
+#: src/e_mod_config.c:126
 #, fuzzy
-msgid "Code"
-msgstr "ICAO kod"
+msgid "Weather location"
+msgstr "Väder"
 
-#: src/e_mod_config.c:129
-msgid "City name"
+#: src/e_mod_config.c:128
+msgid "City name (empty = local): "
 msgstr ""
 
-#: src/e_mod_config.c:132
-msgid "Forecasts WOEID Code or city name: "
+#: src/e_mod_config.c:134
+msgid "Custom location label: "
 msgstr ""
 
-#: src/e_mod_config.c:137
-#, fuzzy
-msgid "To find the code, go to:"
-msgstr "Gå till följande sida för att hitta koden för ditt område:"
+#: src/e_mod_config.c:142
+msgid "Language support"
+msgstr ""
 
-#: src/e_mod_main.c:266
+#: src/e_mod_config.c:144
+msgid "Language code (e.g. sk):    "
+msgstr ""
+
+#: src/e_mod_main.c:290
 msgid "Forecasts"
 msgstr "Prognoser"
 
-#: src/e_mod_main.c:308
+#: src/e_mod_main.c:332
 #, fuzzy
 msgid "Settings"
 msgstr "Enhetsinställningar"
 
-#: src/e_mod_main.c:1185
+#: src/e_mod_main.c:1234
 #, c-format
 msgid "%s: Current Conditions"
 msgstr ""
 
-#: src/e_mod_main.c:1200
-msgid "Wind Chill"
+#: src/e_mod_main.c:1248
+#, fuzzy
+msgid "Wind Chill:"
 msgstr "Vindavkylning"
 
-#: src/e_mod_main.c:1206
-msgid "Wind Speed"
+#: src/e_mod_main.c:1254
+#, fuzzy
+msgid "Wind Speed:"
 msgstr "Vindhastighet"
 
-#: src/e_mod_main.c:1212
-msgid "Humidity"
+#: src/e_mod_main.c:1260
+#, fuzzy
+msgid "Humidity:"
 msgstr "Luftfuktighet"
 
-#: src/e_mod_main.c:1218
-msgid "Visibility"
+#: src/e_mod_main.c:1266
+msgid "Precipitation:"
+msgstr ""
+
+#: src/e_mod_main.c:1272
+#, fuzzy
+msgid "Visibility:"
 msgstr "Sikt"
 
-#: src/e_mod_main.c:1224
-msgid "Pressure"
+#: src/e_mod_main.c:1278
+#, fuzzy
+msgid "Pressure:"
 msgstr "Lufttryck"
 
-#: src/e_mod_main.c:1231
-msgid "Rising"
-msgstr "Soluppgång"
-
-#: src/e_mod_main.c:1233
-msgid "Falling"
-msgstr "Solnedgång"
-
-#: src/e_mod_main.c:1235
-msgid "Steady"
-msgstr "Ihållande"
-
-#: src/e_mod_main.c:1239
-msgid "Sunrise / Sunset"
+#: src/e_mod_main.c:1296
+#, fuzzy
+msgid "Sunrise / Sunset: "
 msgstr "Soluppgång / Solnedgång"
 
-#: src/e_mod_main.c:1257
+#: src/e_mod_main.c:1314
 msgid "Today"
 msgstr ""
 
-#: src/e_mod_main.c:1259
+#: src/e_mod_main.c:1316
 msgid "Tomorrow"
 msgstr ""
 
-#: src/e_mod_main.c:1267
+#: src/e_mod_main.c:1324
 msgid "High"
 msgstr "Hög"
 
-#: src/e_mod_main.c:1278
+#: src/e_mod_main.c:1335
 msgid "Low"
 msgstr "Låg"
+
+#, fuzzy
+#~ msgid "Code"
+#~ msgstr "ICAO kod"
+
+#, fuzzy
+#~ msgid "To find the code, go to:"
+#~ msgstr "Gå till följande sida för att hitta koden för ditt område:"
+
+#~ msgid "Rising"
+#~ msgstr "Soluppgång"
+
+#~ msgid "Falling"
+#~ msgstr "Solnedgång"
+
+#~ msgid "Steady"
+#~ msgstr "Ihållande"
 
 #~ msgid "Forecasts Configuration"
 #~ msgstr "Prognoskonfiguration"
@@ -194,6 +208,3 @@ msgstr "Låg"
 
 #~ msgid "http://www.weather.gov/tg/siteloc.shtml"
 #~ msgstr "http://www.weather.gov/tg/siteloc.shtml"
-
-#~ msgid "Weather"
-#~ msgstr "Väder"

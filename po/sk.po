@@ -14,7 +14,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: src/e_mod_config.c:46
 msgid "Forecasts Settings"
@@ -39,10 +38,7 @@ msgstr "Počet dní predpovede"
 
 #: src/e_mod_config.c:109
 msgid "%2.0f days"
-msgid_plural "%2.0f days"
-msgstr[0] "%u deň"
-msgstr[1] "%u dni"
-msgstr[2] "%u dní"
+msgstr "%2.0f dni"
 
 #: src/e_mod_config.c:112
 msgid "Show Description"
@@ -54,7 +50,7 @@ msgstr "Vyskakovacie okno pri prechode myšou"
 
 #: src/e_mod_config.c:118
 msgid "Unit Settings"
-msgstr "Nastavenia jednotiek"
+msgstr "Nastavenie jednotiek"
 
 #: src/e_mod_config.c:120
 msgid "Metric"
@@ -90,7 +86,7 @@ msgstr "Predpoveď"
 
 #: src/e_mod_main.c:332
 msgid "Settings"
-msgstr "Nastavenia jednotiek"
+msgstr "Nastavenie"
 
 #: src/e_mod_main.c:1234
 #, c-format

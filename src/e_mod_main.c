@@ -5,7 +5,7 @@
  
 //#define FORECASTS    5
 #define KM_TO_MI     1.609344
-#define MB_TO_IN     33.863886667
+#define MB_TO_IN     0.029530
  
 #define GOLDEN_RATIO 1.618033989
  
@@ -1265,7 +1265,10 @@ _forecasts_popup_content_create(Instance *inst)
  
    ob = e_widget_label_add(evas, D_("Pressure"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
-   snprintf(buf, sizeof(buf), "%.0f %s", inst->details.atmosphere.pressure, inst->units.pressure);
+   if (inst->ci->degrees == DEGREES_C)
+      snprintf(buf, sizeof(buf), "%.0f %s", inst->details.atmosphere.pressure, inst->units.pressure);
+   else
+      snprintf(buf, sizeof(buf), "%.2f %s", inst->details.atmosphere.pressure, inst->units.pressure);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
  

@@ -1295,7 +1295,7 @@ _forecasts_popup_content_create(Instance *inst)
  
    ob = e_widget_label_add(evas, D_("Sunrise / Sunset: "));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
-   snprintf(buf, sizeof(buf), "%s", inst->details.astronomy.sunrise);
+   snprintf(buf, sizeof(buf), "%s / ", inst->details.astronomy.sunrise);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 1, 0);
  

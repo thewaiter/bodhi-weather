@@ -662,7 +662,7 @@ _forecasts_server_add(void *data, int type __UNUSED__, void *event)
                               "Connection: close\r\n\r\n",
              lang_buf, inst->ci->host, forecast,inst->ci->host);
    err_server=ecore_con_server_send(inst->server, buf, strlen(buf));
- 
+   INF("Server:\n%s", buf);
    return EINA_FALSE;
 }
  
@@ -685,8 +685,11 @@ _forecasts_server_del(void *data, int type __UNUSED__, void *event)
    inst->server = NULL;
  
    ret = _forecasts_parse_json(inst);
-   _forecasts_converter(inst);
-   _forecasts_display_set(inst, ret);
+   if (ret)
+   {
+      _forecasts_converter(inst);
+      _forecasts_display_set(inst, ret);
+   }
    eina_strbuf_string_free(inst->buffer);
  
    return EINA_FALSE;

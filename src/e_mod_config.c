@@ -156,6 +156,7 @@ static int
 _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
 {
    Config_Item *ci;
+   char *t, *l, *k;
 
    ci = cfd->data;
 
@@ -166,19 +167,18 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
    if (ci->code)
      eina_stringshare_del(ci->code);
 
-   char *t;
-   t = strdup(cfdata->code);
+   if (cfdata->code)
+     t = strdup(cfdata->code);
    *t = toupper(*t);
    ci->code = eina_stringshare_add(t);
 
-   char *l;
-   l = strdup(cfdata->lang);
+   if (cfdata->lang)
+     l = strdup(cfdata->lang);
    *l = tolower(*l);
    ci->lang = eina_stringshare_add(l);
 
-   char *k;
-   k = strdup(cfdata->label);
-   //~ *k = tolower(*l);
+   if(cfdata->label)
+     k = strdup(cfdata->label);
    ci->label = eina_stringshare_add(k);
    
   

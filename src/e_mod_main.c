@@ -136,6 +136,7 @@ static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas
 static void         _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
 //static void         _forecasts_menu_cb_post(void *data, E_Menu *m);  Segfault issue removal
 static Eina_Bool    _forecasts_cb_check(void *data);
+static Eina_Bool    _forecasts_cb_delay(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
@@ -200,7 +201,7 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
-   ecore_timer_add(2.0, _forecasts_cb_check, inst);
+   ecore_timer_add(1.0, _forecasts_cb_delay, inst);
    //~ _forecasts_cb_check(inst);
    
    inst->check_timer =
@@ -564,6 +565,15 @@ _forecasts_free(Forecasts *w)
    evas_object_del(w->icon_obj);
    free(w);
    w = NULL;
+}
+
+static Eina_Bool
+_forecasts_cb_delay(void *data)
+{
+   Instance *inst = data;
+   
+   _forecasts_cb_check(inst);
+   return EINA_FALSE;
 }
 
 static Eina_Bool

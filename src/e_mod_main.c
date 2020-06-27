@@ -574,12 +574,15 @@ _forecasts_cb_check(void *data)
    Instance *inst = data;
    
    Ecore_Con_Url *url_con;
-   char buf[1114];
+   char url[1114];
    char forecast[1024];
    char lang_buf[256] = "";
-   snprintf(buf, sizeof(buf), "http://wttr.in/?format=j1");
 
-   url_con = ecore_con_url_new(buf);
+   snprintf(forecast, sizeof(forecast), "%s?format=j1", inst->ci->code);
+   snprintf(url, sizeof(url), "http://%s%s/%s",
+             lang_buf, inst->ci->host, forecast);
+
+   url_con = ecore_con_url_new(url);
    if (!url_con) WRN("error when creating ecore con url object.\n");
 
    ecore_con_url_data_set(url_con, inst);
@@ -594,6 +597,7 @@ _forecasts_cb_check(void *data)
      ecore_con_url_free(url_con);
      return EINA_FALSE;
 }
+
 
 static Eina_Bool
 _url_data_cb(void *data, int type __UNUSED__, void *event)

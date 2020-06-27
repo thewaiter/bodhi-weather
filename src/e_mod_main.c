@@ -59,12 +59,10 @@ struct _Instance
    Evas_Object         *forecasts_obj;
    Forecasts           *forecasts;
    Ecore_Timer         *check_timer, *delay;
-   Ecore_Con_Server    *server;
-   Ecore_Event_Handler *add_handler;
-   Ecore_Event_Handler *del_handler;
-   Ecore_Event_Handler *data_handler;
+   Eina_Binbuf         *buffer;
+   Eina_List           *handlers;
  
-   struct
+ struct
    {
       int  temp, temp_c, temp_f, code;
       char update[52];
@@ -107,7 +105,6 @@ struct _Instance
       char desc[256];
    } forecast[5];
  
-   Eina_Strbuf    *buffer;
    const char     *location;
    const char     *country;
    const char     *language;
@@ -142,7 +139,6 @@ static Eina_Bool    _forecasts_cb_check(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
-static void         _forecasts_get_proxy(void);
 static Eina_Bool    _forecasts_server_add(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_del(void *data, int type __UNUSED__, void *event);
 static Eina_Bool    _forecasts_server_data(void *data, int type __UNUSED__, void *event);
@@ -154,6 +150,8 @@ static void         _forecasts_convert_distances_float(float *value, int dir);
 static void         _forecasts_convert_pressures(float *value, int dir);
 static void         _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__);
 static void         _forecasts_popup_content_create(Instance *inst);
+static Eina_Bool    _url_data_cb(void *data, int type __UNUSED__, void *event);
+static Eina_Bool    _url_complete_cb(void *data, int type __UNUSED__, void *event);
 static void         _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void         _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void         _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
@@ -175,7 +173,6 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    inst->ci = _forecasts_config_item_get(id);
    inst->area = eina_stringshare_add(inst->ci->code);
    inst->language = eina_stringshare_add(inst->ci->lang);
-   inst->label = eina_stringshare_add(inst->ci->label);
    inst->buffer = eina_strbuf_new();
  
    w = _forecasts_new(gc->evas);
@@ -194,29 +191,19 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
                                   _cb_mouse_in, inst);
    evas_object_event_callback_add(inst->forecasts_obj, EVAS_CALLBACK_MOUSE_OUT,
                                   _cb_mouse_out, inst);
-   
-   if (!inst->add_handler)
-     inst->add_handler =
-       ecore_event_handler_add(ECORE_CON_EVENT_SERVER_ADD,
-                               _forecasts_server_add, inst);
-   
-   if (!inst->del_handler)
-     inst->del_handler =
-       ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL,
-                               _forecasts_server_del, inst);
-   if (!inst->data_handler)
-     inst->data_handler =
-       ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA,
-                               _forecasts_server_data, inst);
- 
-   evas_object_event_callback_add(w->forecasts_obj, EVAS_CALLBACK_MOUSE_DOWN,
-                                  _forecasts_cb_mouse_down, inst);
+
+   inst->buffer = eina_binbuf_new(); 
+
+   E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_COMPLETE,
+                         _url_complete_cb, inst);
+   E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_DATA,
+                         _url_data_cb, inst);
+
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
    _forecasts_cb_check(inst);
    
-   INF("Poll time: %f", inst->ci->poll_time);
    inst->check_timer =
      ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
    return gcc;
@@ -234,23 +221,16 @@ _gc_shutdown(E_Gadcon_Client *gcc)
    if (inst->popup) _forecasts_popup_destroy(inst);
    if (inst->check_timer)
      ecore_timer_del(inst->check_timer);
-   if (inst->add_handler)
-     ecore_event_handler_del(inst->add_handler);
-   if (inst->data_handler)
-     ecore_event_handler_del(inst->data_handler);
-   if (inst->del_handler)
-     ecore_event_handler_del(inst->del_handler);
-   if (inst->server)
-     ecore_con_server_del(inst->server);
+
+   E_FREE_LIST(inst->handlers, ecore_event_handler_del);
+   eina_binbuf_free(inst->buffer);
+
    if (inst->area)
      eina_stringshare_del(inst->area);
    if (inst->language)
      eina_stringshare_del(inst->language);
-   if (inst->label)
-     eina_stringshare_del(inst->label);
    eina_strbuf_free(inst->buffer);
  
-   inst->server = NULL;
    forecasts_config->instances =
      eina_list_remove(forecasts_config->instances, inst);
  
@@ -479,10 +459,10 @@ e_modapi_init(E_Module *m)
  
         forecasts_config->items = eina_list_append(forecasts_config->items, ci);
      }
-   _forecasts_get_proxy();
-   _e_forecast_log_dom = eina_log_domain_register("Forecast", EINA_COLOR_ORANGE);
-   eina_log_domain_level_set("Forecast", EINA_LOG_LEVEL_INFO);
 
+   _e_forecast_log_dom = eina_log_domain_register("Forecast", EINA_COLOR_ORANGE);
+   eina_log_domain_level_set("Forecast", EINA_LOG_LEVEL_DBG);
+   ecore_con_init();
    forecasts_config->module = m;
    e_gadcon_provider_register(&_gadcon_class);
    return m;
@@ -586,35 +566,6 @@ _forecasts_free(Forecasts *w)
    w = NULL;
 }
 
-static void
-_forecasts_get_proxy(void)
-{
-   const char *env;
-   const char *host = NULL;
-   const char *p;
-   int port = 0;
-
-   env = getenv("http_proxy");
-   if ((!env) || (!*env)) env = getenv("HTTP_PROXY");
-   if ((!env) || (!*env)) return;
-   if (strncmp(env, "http://", 7)) return;
-
-   host = strchr(env, ':');
-   host += 3;
-   p = strchr(host, ':');
-   if (p)
-     {
-        if (sscanf(p + 1, "%d", &port) != 1)
-          port = 0;
-     }
-   if ((host) && (port))
-     {
-        if (proxy.host) eina_stringshare_del(proxy.host);
-        proxy.host = eina_stringshare_add_length(host, p - host);
-        proxy.port = port;
-     }
-}
- 
 static Eina_Bool
 _forecasts_cb_check(void *data)
 {
@@ -622,94 +573,69 @@ _forecasts_cb_check(void *data)
    
    Instance *inst = data;
    
-   if (inst->server) ecore_con_server_del(inst->server);
-   inst->server = NULL;
-   INF("Timer forecast_cb_check");
-   
-   if (proxy.port != 0)
-   inst->server =
-       ecore_con_server_connect(ECORE_CON_REMOTE_NODELAY,
-                                proxy.host, proxy.port, inst);
-   else
-     inst->server =
-       ecore_con_server_connect(ECORE_CON_REMOTE_NODELAY, inst->ci->host, 80, inst);
- 
-   if (!inst->server) return EINA_FALSE;
- 
-   return EINA_TRUE;
-}
- 
-static Eina_Bool
-_forecasts_server_add(void *data, int type __UNUSED__, void *event)
-{
-   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
-   
-   Instance *inst = data;
-   Ecore_Con_Event_Server_Add *ev = event;
+   Ecore_Con_Url *url_con;
    char buf[1114];
    char forecast[1024];
    char lang_buf[256] = "";
-   int err_server;
- 
-   if ((!inst->server) || (inst->server != ev->server))
-     return EINA_TRUE;
-     
-   if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
-   snprintf(forecast, sizeof(forecast), "%s?format=j1", inst->ci->code);
- 
-   snprintf(buf, sizeof(buf), "GET http://%s%s/%s HTTP/1.1\r\n"
-                              "Host: %s\r\n"
-                              "Connection: close\r\n\r\n",
-             lang_buf, inst->ci->host, forecast,inst->ci->host);
-   err_server=ecore_con_server_send(inst->server, buf, strlen(buf));
-   INF("Server:\n%s", buf);
-   return EINA_FALSE;
+   snprintf(buf, sizeof(buf), "http://wttr.in/?format=j1");
+
+   url_con = ecore_con_url_new(buf);
+   if (!url_con) WRN("error when creating ecore con url object.\n");
+
+   ecore_con_url_data_set(url_con, inst);
+    if (!ecore_con_url_get(url_con))
+     {
+        WRN("Could not realize url request.\n");
+        goto free_url_con;
+     }
+   return EINA_TRUE;
+
+   free_url_con:
+     ecore_con_url_free(url_con);
+     return EINA_FALSE;
 }
- 
- 
+
 static Eina_Bool
-_forecasts_server_del(void *data, int type __UNUSED__, void *event)
+_url_data_cb(void *data, int type __UNUSED__, void *event)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, ECORE_CALLBACK_PASS_ON);
    
+   Ecore_Con_Event_Url_Data *ev = event;
    Instance *inst = data;
-   Ecore_Con_Event_Server_Del *ev = event;
-   FILE *output;
-   char line[256];
+
+   if (data != ecore_con_url_data_get(ev->url_con)) return ECORE_CALLBACK_PASS_ON;
+
+   if (ev->size > 0)
+     eina_binbuf_append_length(inst->buffer, ev->data, ev->size);
+
+
+   return ECORE_CALLBACK_DONE;
+}
+
+
+static Eina_Bool
+_url_complete_cb(void *data, int type __UNUSED__, void *event)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(data, ECORE_CALLBACK_PASS_ON);
+   
+   Ecore_Con_Event_Url_Complete *ev = event;
+   Instance *inst = data;
    Eina_Bool ret;
- 
-   if ((!inst->server) || (inst->server != ev->server))
-     return EINA_TRUE;
- 
-   ecore_con_server_del(inst->server);
-   inst->server = NULL;
- 
+   
+   if (data != ecore_con_url_data_get(ev->url_con)) return ECORE_CALLBACK_PASS_ON;
+   if (ev->status != 200) return ECORE_CALLBACK_DONE;
+
    ret = _forecasts_parse_json(inst);
    if (ret)
    {
       _forecasts_converter(inst);
       _forecasts_display_set(inst, ret);
    }
-   eina_strbuf_string_free(inst->buffer);
- 
-   return EINA_FALSE;
-}
- 
-static Eina_Bool
-_forecasts_server_data(void *data, int type __UNUSED__, void *event)
-{
-   EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_TRUE);
+   eina_binbuf_reset(inst->buffer);
    
-   Instance *inst = data;
-   Ecore_Con_Event_Server_Data *ev = event;
- 
-   if ((!inst->server) || (inst->server != ev->server))
-     return EINA_TRUE;
-   eina_strbuf_append_length(inst->buffer, ev->data, ev->size);
-   
-      
-   return EINA_FALSE;
+   return ECORE_CALLBACK_DONE;
 }
+
  
 static char *
 seek_text(char * string, const char * value, int jump)
@@ -747,7 +673,7 @@ _forecasts_parse_json(void *data)
    if (!inst->buffer)
      return 0;
    
-   needle = (char *) eina_strbuf_string_get(inst->buffer);
+   needle = (char *) eina_binbuf_string_get(inst->buffer);
    if (needle[0] == '\0') return EINA_FALSE;
    
    needle = seek_text(needle, "humidity", 0);
@@ -768,7 +694,7 @@ _forecasts_parse_json(void *data)
       else 
       {
          have_lang = 0;
-         needle = (char *) eina_strbuf_string_get(inst->buffer);
+         needle = (char *) eina_binbuf_string_get(inst->buffer);
       }
    }
    
@@ -1137,6 +1063,7 @@ _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.temp", buf);
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.description",
                              inst->condition.desc);
+
    if (inst->ci->label[0] == '\0')
    { 
      edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.location", inst->location);

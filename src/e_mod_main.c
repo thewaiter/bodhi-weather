@@ -188,7 +188,8 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
                                   _cb_mouse_in, inst);
    evas_object_event_callback_add(inst->forecasts_obj, EVAS_CALLBACK_MOUSE_OUT,
                                   _cb_mouse_out, inst);
-
+   evas_object_event_callback_add(w->forecasts_obj, EVAS_CALLBACK_MOUSE_DOWN,	
+                                  _forecasts_cb_mouse_down, inst);
    inst->buffer = eina_binbuf_new(); 
 
    E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_COMPLETE,

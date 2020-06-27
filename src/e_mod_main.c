@@ -26,7 +26,7 @@
 EINTERN int _e_forecast_log_dom = -1;
 
 /*Utility functions */
-Eina_Strbuf *url_normalize_str(const char* str);
+char *url_normalize_str(const char* str);
  
 /* Gadcon Function Protos */
 static E_Gadcon_Client *_gc_init(E_Gadcon *gc, const char *name,
@@ -570,17 +570,22 @@ static Eina_Bool
 _forecasts_cb_check(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
-   
+
    Instance *inst = data;
-   
+
    Ecore_Con_Url *url_con;
    char url[1114];
    char forecast[1024];
    char lang_buf[256] = "";
+   char *temp = NULL;
 
-   snprintf(forecast, sizeof(forecast), "%s?format=j1", inst->ci->code);
+   temp = url_normalize_str(inst->ci->code);
+
+   if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);
+   snprintf(forecast, sizeof(forecast), "%s?format=j1", temp);
    snprintf(url, sizeof(url), "http://%s%s/%s",
              lang_buf, inst->ci->host, forecast);
+   free(temp);
 
    url_con = ecore_con_url_new(url);
    if (!url_con) WRN("error when creating ecore con url object.\n");
@@ -1356,12 +1361,19 @@ _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void 
    e_gadcon_popup_hide(inst->popup);
 }
  
-Eina_Strbuf *
+char *
 url_normalize_str(const char *str)
 {
+  EINA_SAFETY_ON_NULL_RETURN_VAL(str, NULL);
+
   Eina_Strbuf *buf;
+  char *ret;
+
   buf = eina_strbuf_new();
   eina_strbuf_append(buf, str);
   eina_strbuf_replace_all(buf, " ", "%20");
-  return buf;
+  ret = eina_strbuf_string_steal(buf);
+  eina_strbuf_string_free(buf);
+
+  return ret;
 } 

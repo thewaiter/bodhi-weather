@@ -200,7 +200,8 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
-   _forecasts_cb_check(inst);
+   ecore_timer_add(2.0, _forecasts_cb_check, inst);
+   //~ _forecasts_cb_check(inst);
    
    inst->check_timer =
      ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
@@ -463,6 +464,7 @@ e_modapi_init(E_Module *m)
    ecore_con_init();
    forecasts_config->module = m;
    e_gadcon_provider_register(&_gadcon_class);
+
    return m;
 }
  

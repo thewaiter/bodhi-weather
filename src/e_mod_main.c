@@ -10,7 +10,7 @@
  
 #define DEFAULT_CITY ""
 #define DEFAULT_LANG ""
-#define TIMER_DELAY 0.5
+#define TIMER_DELAY 2.0
 
 #define PARSER_TEST(val)         \
   do                             \

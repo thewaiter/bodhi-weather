@@ -85,5 +85,5 @@ Bodhi specific modifications, wttr.in API changes, improvements and code moderni
 * _*Robert Wiley*_
 * _*Štefan Uram*_
 
-A special thanks to Igor Chubin for his wonderful [wttr.in] (https://github.com/chubin/wttr.in) command line tool and website.
+A special thanks to Igor Chubin for his wonderful [wttr.in](https://github.com/chubin/wttr.in) command line tool and website.
 

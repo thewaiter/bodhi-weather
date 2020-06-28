@@ -20,7 +20,7 @@ It is recommended Bodhi 5.0 users install from Bodhi's repo:
 
 ```ShellSession
 sudo apt update
-sudo apt install moksha-module-forecast
+sudo apt install moksha-module-forecasts
 ```
 
 Other users need to compile the code:

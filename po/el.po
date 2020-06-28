@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: el\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-24 18:23+0200\n"
+"POT-Creation-Date: 2020-06-28 13:28+0200\n"
 "PO-Revision-Date: 2009-01-09 09:59+0000\n"
 "Last-Translator: Aron <Unknown>\n"
 "Language-Team: Greek <en@li.org>\n"
@@ -69,11 +69,11 @@ msgid "Weather location"
 msgstr ""
 
 #: src/e_mod_config.c:128
-msgid "City name (empty = local): "
+msgid "City name (empty = local) "
 msgstr ""
 
 #: src/e_mod_config.c:134
-msgid "Custom location label: "
+msgid "Custom location label "
 msgstr ""
 
 #: src/e_mod_config.c:142
@@ -81,70 +81,70 @@ msgid "Language support"
 msgstr ""
 
 #: src/e_mod_config.c:144
-msgid "Language code (e.g. sk):    "
+msgid "Language code (e.g. sk)    "
 msgstr ""
 
-#: src/e_mod_main.c:290
+#: src/e_mod_main.c:270
 msgid "Forecasts"
 msgstr "Καιρικές Προβλέψεις"
 
-#: src/e_mod_main.c:332
+#: src/e_mod_main.c:312
 #, fuzzy
 msgid "Settings"
 msgstr "Ρυθμίσεις Μονάδων Μέτρησης"
 
-#: src/e_mod_main.c:1234
+#: src/e_mod_main.c:1183
 #, c-format
 msgid "%s: Current Conditions"
 msgstr ""
 
-#: src/e_mod_main.c:1248
+#: src/e_mod_main.c:1197
 #, fuzzy
 msgid "Wind Chill:"
 msgstr "Ψύχος Ανέμου"
 
-#: src/e_mod_main.c:1254
+#: src/e_mod_main.c:1203
 #, fuzzy
 msgid "Wind Speed:"
 msgstr "Ταχύτητα Ανέμου"
 
-#: src/e_mod_main.c:1260
+#: src/e_mod_main.c:1209
 #, fuzzy
 msgid "Humidity:"
 msgstr "Υγρασία"
 
-#: src/e_mod_main.c:1266
+#: src/e_mod_main.c:1215
 msgid "Precipitation:"
 msgstr ""
 
-#: src/e_mod_main.c:1272
+#: src/e_mod_main.c:1221
 #, fuzzy
 msgid "Visibility:"
 msgstr "Ορατότητα"
 
-#: src/e_mod_main.c:1278
+#: src/e_mod_main.c:1227
 #, fuzzy
 msgid "Pressure:"
 msgstr "Πίεση"
 
-#: src/e_mod_main.c:1296
+#: src/e_mod_main.c:1245
 #, fuzzy
 msgid "Sunrise / Sunset: "
 msgstr "Ανατολή/Δύση Ηλίου"
 
-#: src/e_mod_main.c:1314
+#: src/e_mod_main.c:1263
 msgid "Today"
 msgstr ""
 
-#: src/e_mod_main.c:1316
+#: src/e_mod_main.c:1265
 msgid "Tomorrow"
 msgstr ""
 
-#: src/e_mod_main.c:1324
+#: src/e_mod_main.c:1273
 msgid "High"
 msgstr "Υψηλά"
 
-#: src/e_mod_main.c:1335
+#: src/e_mod_main.c:1284
 msgid "Low"
 msgstr "Χαμηλά"
 

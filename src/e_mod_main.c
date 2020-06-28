@@ -134,9 +134,8 @@ struct
 static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);
 static void         _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
-//static void         _forecasts_menu_cb_post(void *data, E_Menu *m);  Segfault issue removal
+//static void         _forecasts_menu_cb_post(void *data, E_Menu *m); // Segfault issue removal
 static Eina_Bool    _forecasts_cb_check(void *data);
-static Eina_Bool    _forecasts_cb_delay(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
@@ -156,7 +155,8 @@ static void         _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *o
 static Evas_Object *_forecasts_popup_icon_create(Evas *evas, int code);
 static void         _forecasts_popup_destroy(Instance *inst);
 static void         _right_values_update(Instance *inst);
- 
+static void          _forecasts_config_free(void);
+
 /* Gadcon Functions */
 static E_Gadcon_Client *
 _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
@@ -171,12 +171,13 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    inst->ci = _forecasts_config_item_get(id);
    inst->area = eina_stringshare_add(inst->ci->code);
    inst->language = eina_stringshare_add(inst->ci->lang);
-   inst->buffer = eina_strbuf_new();
+   inst->label = eina_stringshare_add(inst->ci->label);
+   inst->buffer = eina_binbuf_new();
  
    w = _forecasts_new(gc->evas);
    w->inst = inst;
    inst->forecasts = w;
- 
+
    o = w->forecasts_obj;
    gcc = e_gadcon_client_new(gc, name, id, style, o);
    gcc->data = inst;
@@ -191,7 +192,6 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
                                   _cb_mouse_out, inst);
    evas_object_event_callback_add(w->forecasts_obj, EVAS_CALLBACK_MOUSE_DOWN,	
                                   _forecasts_cb_mouse_down, inst);
-   inst->buffer = eina_binbuf_new(); 
 
    E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_COMPLETE,
                          _url_complete_cb, inst);
@@ -201,11 +201,9 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
-   ecore_timer_add(1.0, _forecasts_cb_delay, inst);
-   //~ _forecasts_cb_check(inst);
-   
-   inst->check_timer =
-     ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
+   _forecasts_cb_check(inst);
+   inst->check_timer = ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
+
    return gcc;
 }
  
@@ -223,13 +221,18 @@ _gc_shutdown(E_Gadcon_Client *gcc)
      ecore_timer_del(inst->check_timer);
 
    E_FREE_LIST(inst->handlers, ecore_event_handler_del);
-   eina_binbuf_free(inst->buffer);
+   if (inst->buffer) eina_binbuf_free(inst->buffer);
 
+   if (inst->location)
+     eina_stringshare_del(inst->location);
+   if (inst->country)
+     eina_stringshare_del(inst->country);
    if (inst->area)
      eina_stringshare_del(inst->area);
    if (inst->language)
      eina_stringshare_del(inst->language);
-   eina_strbuf_free(inst->buffer);
+   if (inst->label)
+     eina_stringshare_del(inst->label);
  
    forecasts_config->instances =
      eina_list_remove(forecasts_config->instances, inst);
@@ -328,7 +331,8 @@ _forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUS
                                  EVAS_BUTTON_NONE, ev->timestamp, NULL);
      }
 }
-/*  Segfault issue removal
+
+#if 0
 static void
 _forecasts_menu_cb_post(void *data, E_Menu *m)
 {
@@ -336,7 +340,8 @@ _forecasts_menu_cb_post(void *data, E_Menu *m)
      return;
    e_object_del(E_OBJECT(forecasts_config->menu));
    forecasts_config->menu = NULL;
-}*/
+}
+#endif
  
 static void
 _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)
@@ -406,6 +411,35 @@ EAPI E_Module_Api e_modapi = {
    E_MODULE_API_VERSION,
    "Forecasts"
 };
+
+/* This is called when we need to cleanup the actual configuration,
+ * for example when our configuration is too old */
+static void
+_forecasts_config_free(void)
+{
+   EINA_SAFETY_ON_NULL_RETURN(forecasts_config);
+   while (forecasts_config->items)
+     {
+        Config_Item *ci;
+ 
+        ci = forecasts_config->items->data;
+        if (ci->id)
+          eina_stringshare_del(ci->id);
+        if (ci->host)
+          eina_stringshare_del(ci->host);
+        if (ci->code)
+          eina_stringshare_del(ci->code);
+        if (ci->lang)
+          eina_stringshare_del(ci->lang);
+        if(ci->label)
+          eina_stringshare_del(ci->label);
+        forecasts_config->items =
+          eina_list_remove_list(forecasts_config->items, forecasts_config->items);
+        free(ci);
+        ci = NULL;
+     }
+     E_FREE(forecasts_config);
+}
  
 EAPI void *
 e_modapi_init(E_Module *m)
@@ -438,8 +472,16 @@ e_modapi_init(E_Module *m)
 #define T Config
 #define D conf_edd
    E_CONFIG_LIST(D, T, items, conf_item_edd);
+   E_CONFIG_VAL(D, T, version, INT);
  
    forecasts_config = e_config_domain_load("module.forecasts", conf_edd);
+   
+   if (forecasts_config) {
+     /* Check config version */
+     if (!e_util_module_config_check("Forecasts", forecasts_config->version, MOD_CONFIG_FILE_VERSION))
+       _forecasts_config_free();
+   }
+   
    if (!forecasts_config)
      {
         Config_Item *ci;
@@ -456,14 +498,19 @@ e_modapi_init(E_Module *m)
         ci->label = eina_stringshare_add("");
         ci->show_text = 1;
         ci->popup_on_hover = 1;
- 
+        
+        forecasts_config->module = m;
         forecasts_config->items = eina_list_append(forecasts_config->items, ci);
+        forecasts_config->version = MOD_CONFIG_FILE_VERSION;
+        /* save the config to disk */
+        e_config_save_queue();
      }
-
+    forecasts_config->module = m; // FIXME: This should not need set twice wtf
+    
    _e_forecast_log_dom = eina_log_domain_register("Forecast", EINA_COLOR_ORANGE);
    eina_log_domain_level_set("Forecast", EINA_LOG_LEVEL_DBG);
    ecore_con_init();
-   forecasts_config->module = m;
+
    e_gadcon_provider_register(&_gadcon_class);
 
    return m;
@@ -485,26 +532,8 @@ e_modapi_shutdown(E_Module *m __UNUSED__)
     *    forecasts_config->menu = NULL;
     *} */
  
-   while (forecasts_config->items)
-     {
-        Config_Item *ci;
+   _forecasts_config_free();
  
-        ci = forecasts_config->items->data;
-        if (ci->id)
-          eina_stringshare_del(ci->id);
-        if (ci->host)
-          eina_stringshare_del(ci->host);
-        if (ci->code)
-          eina_stringshare_del(ci->code);
-        if (ci->lang)
-          eina_stringshare_del(ci->lang);
-        forecasts_config->items =
-          eina_list_remove_list(forecasts_config->items, forecasts_config->items);
-        free(ci);
-        ci = NULL;
-     }
- 
-   E_FREE(forecasts_config);
    E_CONFIG_DD_FREE(conf_item_edd);
    E_CONFIG_DD_FREE(conf_edd);
    
@@ -568,15 +597,6 @@ _forecasts_free(Forecasts *w)
 }
 
 static Eina_Bool
-_forecasts_cb_delay(void *data)
-{
-   Instance *inst = data;
-   
-   _forecasts_cb_check(inst);
-   return EINA_FALSE;
-}
-
-static Eina_Bool
 _forecasts_cb_check(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
@@ -588,6 +608,7 @@ _forecasts_cb_check(void *data)
    char forecast[1024];
    char lang_buf[256] = "";
    char *temp = NULL;
+
 
    temp = url_normalize_str(inst->ci->code);
 
@@ -606,7 +627,7 @@ _forecasts_cb_check(void *data)
         WRN("Could not realize url request.\n");
         goto free_url_con;
      }
-   return EINA_TRUE;
+   return EINA_FALSE;
 
    free_url_con:
      ecore_con_url_free(url_con);
@@ -690,7 +711,7 @@ _forecasts_parse_json(void *data)
    int have_lang = 0;
  
    if (!inst->buffer)
-     return 0;
+     return EINA_FALSE;
    
    needle = (char *) eina_binbuf_string_get(inst->buffer);
    if (needle[0] == '\0') return EINA_FALSE;
@@ -1064,7 +1085,7 @@ _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
  
    char buf[4096];
    char m[4096];
- 
+
    snprintf(m, sizeof(m), "%s/forecasts.edj",
             e_module_dir_get(forecasts_config->module));
    snprintf(buf, sizeof(buf), "modules/forecasts/icons/%d", inst->condition.code);
@@ -1159,7 +1180,6 @@ _forecasts_config_updated(Config_Item *ci)
         else
           ecore_timer_interval_set(inst->check_timer,
                                    inst->ci->poll_time);
- 
      }
 }
  
@@ -1324,6 +1344,7 @@ _forecasts_popup_destroy(Instance *inst)
  
    if (!inst->popup) return;
    e_object_del(E_OBJECT(inst->popup));
+   inst->popup = NULL;
 }
  
 static void

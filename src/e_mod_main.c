@@ -10,7 +10,7 @@
  
 #define DEFAULT_CITY ""
 #define DEFAULT_LANG ""
-#define TIMER_DELAY 2.0
+#define TIMER_DELAY 0.5
 
 #define PARSER_TEST(val)         \
   do                             \
@@ -1341,17 +1341,21 @@ _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
    Instance *inst = data;
    Evas_Event_Mouse_Down *ev = event_info;
  
-   if (!inst->ci->popup_on_hover)
+   if ((ev->button == 1) && (ev->flags & EVAS_BUTTON_DOUBLE_CLICK))  
+    {
+     _forecasts_cb_check(inst);
+    }
+    else if (ev->button == 1)
      {
-        if (!inst->popup) _forecasts_popup_content_create(inst);
-        e_gadcon_popup_show(inst->popup);
-        return;
-     }
- 
-   if (ev->button == 1)
-     {
-        e_gadcon_popup_toggle_pinned(inst->popup);
-     }
+       if (!inst->ci->popup_on_hover)
+          {
+             if (!inst->popup) _forecasts_popup_content_create(inst);
+             e_gadcon_popup_show(inst->popup);
+             return;
+          }
+      e_gadcon_popup_toggle_pinned(inst->popup);
+    }
+
 }
  
 static void

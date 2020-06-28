@@ -622,11 +622,11 @@ _forecasts_cb_check(void *data)
         WRN("Could not realize url request.\n");
         goto free_url_con;
      }
-   return EINA_FALSE;
+   return ECORE_CALLBACK_RENEW;
 
    free_url_con:
      ecore_con_url_free(url_con);
-     return EINA_FALSE;
+     return ECORE_CALLBACK_RENEW;
 }
 
 

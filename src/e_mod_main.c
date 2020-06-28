@@ -10,6 +10,7 @@
  
 #define DEFAULT_CITY ""
 #define DEFAULT_LANG ""
+#define TIMER_DELAY 2.0
 
 #define PARSER_TEST(val)         \
   do                             \
@@ -196,8 +197,7 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
-   _forecasts_cb_check(inst);
-   inst->check_timer = ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check, inst);
+   inst->check_timer = ecore_timer_add(TIMER_DELAY, _forecasts_cb_check, inst);
 
    return gcc;
 }
@@ -597,14 +597,14 @@ _forecasts_cb_check(void *data)
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
 
    Instance *inst = data;
-
    Ecore_Con_Url *url_con;
    char url[1114];
    char forecast[1024];
    char lang_buf[256] = "";
    char *temp = NULL;
 
-
+   if (eina_dbl_exact(ecore_timer_interval_get(inst->check_timer), TIMER_DELAY))
+      ecore_timer_interval_set(inst->check_timer, inst->ci->poll_time);
    temp = url_normalize_str(inst->ci->code);
 
    if ((inst->ci->lang[0]) != '\0') snprintf(lang_buf, 256, "%s.", inst->ci->lang);

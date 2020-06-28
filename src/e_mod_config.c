@@ -29,7 +29,7 @@ _config_forecasts_module(Config_Item *ci)
    E_Config_Dialog *cfd;
    E_Config_Dialog_View *v;
    E_Container *con;
-   char buf[4096];
+   // char buf[4096];
 
    v = E_NEW(E_Config_Dialog_View, 1);
 
@@ -181,7 +181,9 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
      k = strdup(cfdata->label);
    ci->label = eina_stringshare_add(k);
    
-  
+   free(t);
+   free(l);
+   free(k);
    ci->show_text = cfdata->show_text;
    ci->popup_on_hover = cfdata->popup_on_hover;
 

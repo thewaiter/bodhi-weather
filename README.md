@@ -6,7 +6,7 @@ This is a module for moksha or e17 to display weather information on your deskto
 
 >As of Thursday, Jan. 3, 2019, the weather.yahooapis.com and query.yahooapis.com for Yahoo Weather API will be retired.
 
-The Bodhi Team was never comfortable with the new API Terms of service and abondoned the module with the goal of finding a more suitable weather API. To that end [Štefan 'the waiter' Uram](https://github.com/thewaiter) settled on using [wttr.in](http://wttr.in/) and began work on porting the old forecast code over to this new API. [Robert (ylee) Wiley](https://github.com/rbtylee) naturally helped some in this project. Special thanks to [Igor Chubin](https://github.com/chubin) for consultation and assisitance in this endeavor.
+The Bodhi Team was never comfortable with the new API Terms of service and abondoned the module with the goal of finding a more suitable weather API. To that end [Štefan 'waiter' Uram](https://github.com/thewaiter) settled on using [wttr.in](http://wttr.in/) and began work on porting the old forecast code over to this new API. [Robert 'ylee' Wiley](https://github.com/rbtylee) naturally helped some in this project. Special thanks to [Igor Chubin](https://github.com/chubin) for consultation and assisitance in this endeavor.
 
 # Dependencies
 

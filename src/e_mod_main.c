@@ -3,7 +3,6 @@
 #include <Elementary.h>
  
  
-//#define FORECASTS    5
 #define KM_TO_MI     1.609344
 #define MB_TO_IN     0.029530
  
@@ -141,10 +140,6 @@ static Forecasts   *_forecasts_new(Evas *evas);
 static void         _forecasts_free(Forecasts *w);
 static Eina_Bool    _forecasts_parse_json(void *data);
 static void         _forecasts_converter(Instance *inst);
-static void         _forecasts_convert_degrees(int *value, int dir);
-static void         _forecasts_convert_distances(int *value, int dir);
-static void         _forecasts_convert_distances_float(float *value, int dir);
-static void         _forecasts_convert_pressures(float *value, int dir);
 static void         _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__);
 static void         _forecasts_popup_content_create(Instance *inst);
 static Eina_Bool    _url_data_cb(void *data, int type __UNUSED__, void *event);
@@ -1252,15 +1247,6 @@ _forecasts_popup_content_create(Instance *inst)
       snprintf(buf, sizeof(buf), "%.2f %s", inst->details.atmosphere.pressure, inst->units.pressure);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0);
- 
-   //~ if (inst->details.atmosphere.rising == 1)
-     //~ snprintf(buf, sizeof(buf), D_("Rising"));
-   //~ else if (inst->details.atmosphere.rising == 2)
-     //~ snprintf(buf, sizeof(buf), D_("Falling"));
-   //~ else
-     //~ snprintf(buf, sizeof(buf), D_("Steady"));
-   //~ ob = e_widget_label_add(evas, buf);
-   //~ e_widget_frametable_object_append(of, ob, 2, row, 1, 1, 1, 0, 1, 0);
  
    ob = e_widget_label_add(evas, D_("Sunrise / Sunset: "));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);

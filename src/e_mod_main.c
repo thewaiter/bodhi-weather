@@ -64,7 +64,9 @@ struct _Instance
  
  struct
    {
-      int  temp, temp_c, temp_f, code;
+      int  code;
+      int  temp, temp_c, temp_f;
+      int  feel, feel_c, feel_f;
       char update[52];
       char desc[256];
    } condition;
@@ -711,6 +713,16 @@ _forecasts_parse_json(void *data)
    needle = (char *) eina_binbuf_string_get(inst->buffer);
    if (needle[0] == '\0') return EINA_FALSE;
    
+   needle = seek_text(needle, "FeelsLikeC", 0);
+   needle = seek_text(needle, ":", 3);
+   PARSER_TEST("FeelsLikeC");
+   sscanf(needle, "%d\"", &inst->condition.feel_c);
+   
+   needle = seek_text(needle, "FeelsLikeF", 0);
+   needle = seek_text(needle, ":", 3);
+   PARSER_TEST("FeelsLikeF");
+   sscanf(needle, "%d\"", &inst->condition.feel_f);
+   
    needle = seek_text(needle, "humidity", 0);
    needle = seek_text(needle, ":", 3);
    PARSER_TEST("humidity");
@@ -1013,6 +1025,7 @@ _forecasts_converter(Instance *inst)
         snprintf(inst->units.speed, 5, "km/h");
        
         inst->condition.temp = inst->condition.temp_c;
+        inst->condition.feel = inst->condition.feel_c;
         inst->details.wind.speed = inst->details.wind.speed_km;
         inst->details.wind.chill = inst->details.wind.chill_c;
         inst->details.atmosphere.visibility = inst->details.atmosphere.visibility_km;
@@ -1032,6 +1045,7 @@ _forecasts_converter(Instance *inst)
         snprintf(inst->units.speed, 4, "mph");
        
         inst->condition.temp = inst->condition.temp_f;
+        inst->condition.feel = inst->condition.feel_f;
         inst->details.wind.speed = inst->details.wind.speed_mi;
         inst->details.wind.chill = inst->details.wind.chill_f;
         inst->details.atmosphere.visibility = inst->details.atmosphere.visibility_mi;
@@ -1208,6 +1222,12 @@ _forecasts_popup_content_create(Instance *inst)
    if (h > 160) h = 160;  /* In the future, the icon should be set from the theme, not part of the table */
    ob = e_widget_image_add_from_object(evas, oi, w, h);
    e_widget_frametable_object_append(of, ob, 2, row, 1, 2, 1, 0, 1, 1);
+ 
+   ob = e_widget_label_add(evas, D_("Feels Like:"));
+   e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);
+   snprintf(buf, sizeof(buf), "%d °%c", inst->condition.feel, inst->units.temp);
+   ob = e_widget_label_add(evas, buf);
+   e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 0, 0); 
  
    ob = e_widget_label_add(evas, D_("Wind Chill:"));
    e_widget_frametable_object_append(of, ob, 0, ++row, 1, 1, 1, 0, 0, 0);

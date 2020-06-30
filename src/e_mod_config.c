@@ -52,7 +52,7 @@ static void
 _fill_data(Config_Item *ci, E_Config_Dialog_Data *cfdata)
 {
    cfdata->poll_time = (ci->poll_time / 60.0);
-   cfdata->days = (ci->days / 5.0);
+   cfdata->days = ci->days;
    cfdata->degrees = ci->degrees;
    if (ci->code)
      cfdata->code = strdup(ci->code);
@@ -126,26 +126,26 @@ _basic_create_widgets(E_Config_Dialog *cfd __UNUSED__, Evas *evas,
    of = e_widget_frametable_add(evas, D_("Weather location"), 0);
    
    ob = e_widget_label_add(evas, D_("City name (empty = local) "));
-   e_widget_frametable_object_append(of, ob, 0, 3, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 0, 1, 1, 1, 1, 0, 1, 0);
    ob = e_widget_entry_add(evas, &cfdata->code, NULL, NULL, NULL);
    e_widget_size_min_set(ob, 120, 28);
-   e_widget_frametable_object_append(of, ob, 1, 3, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 1, 1, 1, 1, 1, 0, 1, 0);
    
    ob = e_widget_label_add(evas, D_("Custom location label "));
-   e_widget_frametable_object_append(of, ob, 0, 4, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 0, 2, 1, 1, 1, 0, 1, 0);
    ob = e_widget_entry_add(evas, &cfdata->label, NULL, NULL, NULL);
    e_widget_size_min_set(ob, 120, 28);
-   e_widget_frametable_object_append(of, ob, 1, 4, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 1, 2, 1, 1, 1, 0, 1, 0);
    
    e_widget_list_object_append(o, of, 1, 1, 0.5);
    
    of = e_widget_frametable_add(evas, D_("Language support"), 0);
    
    ob = e_widget_label_add(evas, D_("Language code (e.g. sk)    "));
-   e_widget_frametable_object_append(of, ob, 0, 4, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 0, 1, 1, 1, 1, 0, 1, 0);
    ob = e_widget_entry_add(evas, &cfdata->lang, NULL, NULL, NULL);
    e_widget_size_min_set(ob, 40, 28);
-   e_widget_frametable_object_append(of, ob, 1, 4, 1, 1, 1, 0, 1, 0);
+   e_widget_frametable_object_append(of, ob, 1, 1, 1, 1, 1, 0, 1, 0);
    
    e_widget_list_object_append(o, of, 1, 1, 0.5);
 
@@ -162,7 +162,7 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
 
    ci->degrees = cfdata->degrees;
    ci->poll_time = (cfdata->poll_time * 60.0);
-   ci->days = (cfdata->days * 5.0);
+   ci->days = cfdata->days;
    
    if (ci->code)
      eina_stringshare_del(ci->code);

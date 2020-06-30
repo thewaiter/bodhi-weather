@@ -390,7 +390,7 @@ _forecasts_config_item_get(const char *id)
    ci = E_NEW(Config_Item, 1);
    ci->id = eina_stringshare_add(id);
    ci->poll_time = 3600.0;
-   ci->days = 15.0;
+   ci->days = 2.0;
    ci->degrees = DEGREES_C;
    ci->host = eina_stringshare_add("wttr.in");
    ci->code = eina_stringshare_add(DEFAULT_CITY);
@@ -487,7 +487,7 @@ e_modapi_init(E_Module *m)
         ci = E_NEW(Config_Item, 1);
         ci->id = eina_stringshare_add("0");
         ci->poll_time = 3600.0;
-        ci->days = 15.0;
+        ci->days = 2.0;
         ci->degrees = DEGREES_C;
         ci->host = eina_stringshare_add("wttr.in");
         ci->code = eina_stringshare_add(DEFAULT_CITY);
@@ -1281,7 +1281,7 @@ _forecasts_popup_content_create(Instance *inst)
    e_widget_list_object_append(o, of, 1, 1, 0.5);
    ol = e_widget_list_add(evas, 1, 1);
  
-   for (i = 0; i < inst->ci->days / 5; i++)
+   for (i = 0; i < inst->ci->days; i++)
      {
         row = 0;
  

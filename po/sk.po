@@ -96,35 +96,35 @@ msgstr "%s: Aktuálne počasie"
 
 #: src/e_mod_main.c:1226
 msgid "Feels Like:"
-msgstr ""
+msgstr "Pocitová teplota:"
 
 #: src/e_mod_main.c:1232
 msgid "Wind Chill:"
-msgstr "Chladnosť vetra"
+msgstr "Chladnosť vetra:"
 
 #: src/e_mod_main.c:1238
 msgid "Wind Speed:"
-msgstr "Rýchlosť vetra"
+msgstr "Rýchlosť vetra:"
 
 #: src/e_mod_main.c:1244
 msgid "Humidity:"
-msgstr "Vlhkosť"
+msgstr "Vlhkosť:"
 
 #: src/e_mod_main.c:1250
 msgid "Precipitation:"
-msgstr "Úhrn zrážok"
+msgstr "Úhrn zrážok:"
 
 #: src/e_mod_main.c:1256
 msgid "Visibility:"
-msgstr "Viditeľnosť"
+msgstr "Viditeľnosť:"
 
 #: src/e_mod_main.c:1262
 msgid "Pressure:"
-msgstr "Tlak"
+msgstr "Tlak:"
 
 #: src/e_mod_main.c:1271
 msgid "Sunrise / Sunset: "
-msgstr "Východ / západ slnka"
+msgstr "Východ/Západ slnka: "
 
 #: src/e_mod_main.c:1289
 msgid "Today"

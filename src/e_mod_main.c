@@ -9,7 +9,7 @@
 #define GOLDEN_RATIO 1.618033989
  
 #define DEFAULT_CITY ""
-#define DEFAULT_LANG ""
+#define DEFAULT_LANG e_intl_language_get()
 #define TIMER_DELAY 2.0
 
 #define PARSER_TEST(val)         \
@@ -27,6 +27,7 @@ EINTERN int _e_forecast_log_dom = -1;
 
 /*Utility functions */
 char *url_normalize_str(const char* str);
+char *lang_normalize_str(const char* str);
  
 /* Gadcon Function Protos */
 static E_Gadcon_Client *_gc_init(E_Gadcon *gc, const char *name,
@@ -353,12 +354,14 @@ _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi _
    _config_forecasts_module(inst->ci);
 }
  
+
 static Config_Item *
 _forecasts_config_item_get(const char *id)
 {
    Eina_List *l;
    Config_Item *ci;
    char buf[128];
+   
  
    if (!id)
      {
@@ -394,7 +397,7 @@ _forecasts_config_item_get(const char *id)
    ci->degrees = DEGREES_C;
    ci->host = eina_stringshare_add("wttr.in");
    ci->code = eina_stringshare_add(DEFAULT_CITY);
-   ci->lang = eina_stringshare_add(DEFAULT_LANG);
+   ci->lang = eina_stringshare_add(lang_normalize_str(DEFAULT_LANG));
    ci->label = eina_stringshare_add("");
    ci->show_text = 1;
    ci->popup_on_hover = 1;
@@ -491,7 +494,7 @@ e_modapi_init(E_Module *m)
         ci->degrees = DEGREES_C;
         ci->host = eina_stringshare_add("wttr.in");
         ci->code = eina_stringshare_add(DEFAULT_CITY);
-        ci->lang = eina_stringshare_add(DEFAULT_LANG);
+        ci->lang = eina_stringshare_add(lang_normalize_str(DEFAULT_LANG));
         ci->label = eina_stringshare_add("");
         ci->show_text = 1;
         ci->popup_on_hover = 1;
@@ -1417,4 +1420,21 @@ url_normalize_str(const char *str)
   eina_strbuf_string_free(buf);
 
   return ret;
+} 
+
+char *
+lang_normalize_str(const char *str)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(str, NULL);
+
+  Eina_Strbuf *buf;
+  char *lang;
+
+  buf = eina_strbuf_new();
+  eina_strbuf_append(buf, str);
+  eina_strbuf_remove(buf, 2, strlen(str));
+  lang = eina_strbuf_string_steal(buf);
+  eina_strbuf_string_free(buf);
+
+  return lang;
 } 

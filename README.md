@@ -50,16 +50,16 @@ Menus->Settings->Gadgets->Background
 [<img src="https://i.imgur.com/TXKCu9E.jpg ">](https://i.imgur.com/TXKCu9E.jpg )
 
 
-- Poll time: refresh weather data
+- Poll time: a period for weather data download (15 - 60 minutes)
 - Forecasts days: 2 or 3 days forecast in popup dialog
-- Show description: Show/Hide weather description (useful for gadget placed on the shelf) 
-- Popup on mouse over: Popup dialog show on mouse over or mouse click
+- Show description: Show/Hide weather description (useful for a gadget placed on the shelf) 
+- Popup on mouse over: Popup dialog shows on mouse over or mouse click
 - Unit Settings: Metric/English
 - City name: empty is default for the current location
 - Custom location label: User's optional label (useful for long location name)
 - Language code: empty is default for English. 66 other language codes are accepted
 
-- Mouse double click on weather gadget: refresh data
+- Mouse double click on weather gadget: refresh weather data
 
 # Pure enlightenment
 

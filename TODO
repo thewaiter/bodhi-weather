@@ -1,3 +1,16 @@
 Nothing much to see here now ...
 
-Lang should default to current locale
+
+Fix this truncation warning and set the array sizes to lowest min sizes needed for all
+
+e_mod_main.c: In function ‘_forecasts_cb_check’:
+e_mod_main.c:617:44: warning: ‘%s’ directive output may be truncated writing up to 1023 bytes into a region of size between 851 and 1106 [-Wformat-truncation=]
+  617 |    snprintf(url, sizeof(url), "http://%s%s/%s",
+      |                                            ^~
+  618 |              lang_buf, inst->ci->host, forecast);
+      |                                        ~~~~~~~~
+e_mod_main.c:617:4: note: ‘snprintf’ output 9 or more bytes (assuming 1287) into a destination of size 1114
+  617 |    snprintf(url, sizeof(url), "http://%s%s/%s",
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  618 |              lang_buf, inst->ci->host, forecast);
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

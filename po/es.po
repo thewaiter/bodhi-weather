@@ -101,7 +101,7 @@ msgstr "%s: Condiciones Actuales"
 
 #: src/e_mod_main.c:1226
 msgid "Feels Like:"
-msgstr ""
+msgstr "Se siente como"
 
 #: src/e_mod_main.c:1232
 msgid "Wind Chill:"

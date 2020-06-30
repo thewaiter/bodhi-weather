@@ -2,7 +2,7 @@
 
 # forecast2.0
 
-[<img src="https://i.imgur.com/nS0amXW.jpg  ">](https://https://i.imgur.com/nS0amXW.jpg )
+[<img src="https://i.imgur.com/0n1e1eR.jpg   ">](https://i.imgur.com/0n1e1eR.jpg )
 
 This is a module for moksha or e17 to display weather information on your desktop or shelf. It is a refactoring of the old e17 [forecast module](https://github.com/JeffHoogland/moksha-modules-extra/tree/master/forecasts) . That module is sadly dead being killed by yahoo API changes:
 

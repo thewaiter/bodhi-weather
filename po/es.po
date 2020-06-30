@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enlightenment\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2020-06-24 19:41-0500\n"
 "Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
 "Language-Team: Spanish <>\n"
@@ -94,52 +94,55 @@ msgstr "Predicciones meteorológicas"
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr "%s: Condiciones Actuales"
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 msgid "Wind Chill:"
 msgstr "Frío del viento:"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 msgid "Wind Speed:"
 msgstr "Velocidad del viento:"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 msgid "Humidity:"
 msgstr "Humedad:"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr "Precipitación:"
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 msgid "Visibility:"
 msgstr "Visibilidad:"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 msgid "Pressure:"
 msgstr "Presión:"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 msgid "Sunrise / Sunset: "
 msgstr "Salida de sol / Puesta de sol"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr "Hoy"
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr "Mañana"
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "Alta"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "Baja"
-

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enlightenment\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2009-03-24 15:30+0000\n"
 "Last-Translator: Stefan Uram <thewaiter@centrum.sk>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -89,51 +89,55 @@ msgstr "Predpoveď"
 msgid "Settings"
 msgstr "Nastavenie"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr "%s: Aktuálne počasie"
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 msgid "Wind Chill:"
 msgstr "Chladnosť vetra"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 msgid "Wind Speed:"
 msgstr "Rýchlosť vetra"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 msgid "Humidity:"
 msgstr "Vlhkosť"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr "Úhrn zrážok"
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 msgid "Visibility:"
 msgstr "Viditeľnosť"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 msgid "Pressure:"
 msgstr "Tlak"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 msgid "Sunrise / Sunset: "
 msgstr "Východ / západ slnka"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr "Dnes"
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr "Zajtra"
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "Najvyššia"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "Najnižšia"

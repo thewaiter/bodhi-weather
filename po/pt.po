@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: forecasts\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2012-08-25 01:08+0100\n"
 "Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
 "Language-Team: Portuguese <>\n"
@@ -96,58 +96,62 @@ msgstr "Previsões meteorológicas"
 msgid "Settings"
 msgstr "Definições"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr "%s: Condições atuais"
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 #, fuzzy
 msgid "Wind Chill:"
 msgstr "Temperatura aparente"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 #, fuzzy
 msgid "Wind Speed:"
 msgstr "Velocidade do vento"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 #, fuzzy
 msgid "Humidity:"
 msgstr "Humidade"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr ""
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 #, fuzzy
 msgid "Visibility:"
 msgstr "Visibilidade"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 #, fuzzy
 msgid "Pressure:"
 msgstr "Pressão"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 #, fuzzy
 msgid "Sunrise / Sunset: "
 msgstr "Nascer do sol/Pôr do sol"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr "Hoje"
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr "Amanhã"
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "Alta"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "Baixa"
 

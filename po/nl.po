@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enlightenment\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2011-09-04 16:01+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -91,58 +91,62 @@ msgstr "Weerbericht"
 msgid "Settings"
 msgstr "Instellingen"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr "%s: Huidige omstandigheden"
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 #, fuzzy
 msgid "Wind Chill:"
 msgstr "Windkoude"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 #, fuzzy
 msgid "Wind Speed:"
 msgstr "Windsnelheid"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 #, fuzzy
 msgid "Humidity:"
 msgstr "Luchtvochtigheid"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr ""
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 #, fuzzy
 msgid "Visibility:"
 msgstr "Zichtbaarheid"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 #, fuzzy
 msgid "Pressure:"
 msgstr "Luchtdruk"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 #, fuzzy
 msgid "Sunrise / Sunset: "
 msgstr "Zonsopgang / Zonsondergang"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr "Vandaag"
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr "Morgen"
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "Hoog"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "Laag"
 

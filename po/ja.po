@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Weather\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2008-11-22 04:19+0000\n"
 "Last-Translator: Yasufumi Haga <yasufumi.haga@nifty.com>\n"
 "Language-Team: none\n"
@@ -94,58 +94,62 @@ msgstr ""
 msgid "Settings"
 msgstr "単位設定"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr ""
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 #, fuzzy
 msgid "Wind Chill:"
 msgstr "体感温度"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 #, fuzzy
 msgid "Wind Speed:"
 msgstr "風速"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 #, fuzzy
 msgid "Humidity:"
 msgstr "湿度"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr ""
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 #, fuzzy
 msgid "Visibility:"
 msgstr "視界"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 #, fuzzy
 msgid "Pressure:"
 msgstr "気圧"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 #, fuzzy
 msgid "Sunrise / Sunset: "
 msgstr "日の出／日の入り"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr ""
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr ""
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "高"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "低"
 

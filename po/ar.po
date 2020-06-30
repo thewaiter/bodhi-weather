@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: forcast module\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-06-28 13:28+0200\n"
+"POT-Creation-Date: 2020-06-30 15:26+0200\n"
 "PO-Revision-Date: 2012-01-24 20:44+0300\n"
 "Last-Translator: سمير حسين <almusalimalmusalimah@gmail.com>\n"
 "Language-Team: Arabic <almusalimalmusalimah@gmail.com>\n"
@@ -94,58 +94,62 @@ msgstr "التوقعات"
 msgid "Settings"
 msgstr "اﻹعدادات"
 
-#: src/e_mod_main.c:1183
+#: src/e_mod_main.c:1212
 #, c-format
 msgid "%s: Current Conditions"
 msgstr "%s: الوضع الحالي"
 
-#: src/e_mod_main.c:1197
+#: src/e_mod_main.c:1226
+msgid "Feels Like:"
+msgstr ""
+
+#: src/e_mod_main.c:1232
 #, fuzzy
 msgid "Wind Chill:"
 msgstr "برودة الرياح"
 
-#: src/e_mod_main.c:1203
+#: src/e_mod_main.c:1238
 #, fuzzy
 msgid "Wind Speed:"
 msgstr "سرعة الرياح"
 
-#: src/e_mod_main.c:1209
+#: src/e_mod_main.c:1244
 #, fuzzy
 msgid "Humidity:"
 msgstr "الرطوبة"
 
-#: src/e_mod_main.c:1215
+#: src/e_mod_main.c:1250
 msgid "Precipitation:"
 msgstr ""
 
-#: src/e_mod_main.c:1221
+#: src/e_mod_main.c:1256
 #, fuzzy
 msgid "Visibility:"
 msgstr "الرؤية"
 
-#: src/e_mod_main.c:1227
+#: src/e_mod_main.c:1262
 #, fuzzy
 msgid "Pressure:"
 msgstr "الضغط"
 
-#: src/e_mod_main.c:1245
+#: src/e_mod_main.c:1271
 #, fuzzy
 msgid "Sunrise / Sunset: "
 msgstr "الشروق / الغروب"
 
-#: src/e_mod_main.c:1263
+#: src/e_mod_main.c:1289
 msgid "Today"
 msgstr "اليوم"
 
-#: src/e_mod_main.c:1265
+#: src/e_mod_main.c:1291
 msgid "Tomorrow"
 msgstr "غدا"
 
-#: src/e_mod_main.c:1273
+#: src/e_mod_main.c:1299
 msgid "High"
 msgstr "عالي"
 
-#: src/e_mod_main.c:1284
+#: src/e_mod_main.c:1310
 msgid "Low"
 msgstr "منخفض"
 

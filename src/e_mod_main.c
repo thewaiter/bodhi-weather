@@ -125,14 +125,6 @@ struct _Forecasts
    Evas_Object *icon_obj;
 };
  
-struct
-{
-   const char *host;
-   int         port;
-} proxy = {
-   NULL, 0
-};
- 
 /* Module Function Protos */
 static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);

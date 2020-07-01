@@ -26,9 +26,6 @@ extern int _e_forecast_log_dom;
 #define DEGREES_F 0
 #define DEGREES_C 1
 
-#define WOEID_CODE 1
-#define WOEID_CITY 0
-
 /* Macros used for config file versioning */
 /* You can increment the EPOCH value if the old configuration is not
  * compatible anymore, it creates an entire new one.
@@ -54,7 +51,7 @@ struct _Config
    E_Config_Dialog *config_dialog;
    Eina_List *instances;
    Eina_List *items;
-   // E_Menu *menu; Segfault issue removal
+   E_Menu *menu;
 };
 
 struct _Config_Item

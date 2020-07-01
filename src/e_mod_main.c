@@ -137,7 +137,7 @@ struct
 static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);
 static void         _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
-//static void         _forecasts_menu_cb_post(void *data, E_Menu *m); // Segfault issue removal
+static void         _forecasts_menu_cb_post(void *data, E_Menu *m);
 static Eina_Bool    _forecasts_cb_check(void *data);
 static Config_Item *_forecasts_config_item_get(const char *id);
 static Forecasts   *_forecasts_new(Evas *evas);
@@ -315,9 +315,8 @@ _forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUS
         e_menu_item_callback_set(mi, _forecasts_menu_cb_configure, inst);
  
         m = e_gadcon_client_util_menu_items_append(inst->gcc, m, 0);
-        //  Segfault issue removal
-        //e_menu_post_deactivate_callback_set(m, _forecasts_menu_cb_post, inst);
-        //forecasts_config->menu = m;
+        e_menu_post_deactivate_callback_set(m, _forecasts_menu_cb_post, inst);
+        forecasts_config->menu = m;
  
         e_gadcon_canvas_zone_geometry_get(inst->gcc->gadcon, &x, &y, &w, &h);
         e_menu_activate_mouse(m,
@@ -330,7 +329,6 @@ _forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUS
      }
 }
 
-#if 0
 static void
 _forecasts_menu_cb_post(void *data, E_Menu *m)
 {
@@ -339,7 +337,6 @@ _forecasts_menu_cb_post(void *data, E_Menu *m)
    e_object_del(E_OBJECT(forecasts_config->menu));
    forecasts_config->menu = NULL;
 }
-#endif
  
 static void
 _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)

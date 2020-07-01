@@ -1,0 +1,12 @@
+moksha-module-forecasts (20200701bodhi1-1) bionic; urgency=medium
+
+  * wttr.in release
+
+ -- Robert Wiley <ylee@bodhilinux.com>  Wed, 01 Jul 2020 14:28:03 -0400
+
+
+moksha-module-forecasts (20180607bodhi1-1) bionic; urgency=medium
+
+  * Initial release
+
+ -- Robert Wiley <ylee@bodhilinux.com>  Thu, 07 Jun 2018 11:39:13 -0400

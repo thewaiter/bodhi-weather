@@ -26,6 +26,8 @@ extern int _e_forecast_log_dom;
 #define ERR(...)            EINA_LOG_DOM_ERR(_e_forecast_log_dom, __VA_ARGS__)
 #define CRI(...)            EINA_LOG_DOM_CRIT(_e_forecast_log_dom, __VA_ARGS__)
 
+#define FORECASTS    3
+
 typedef struct _Instance  Instance;
 typedef struct _Forecasts Forecasts;
 typedef struct _Config Config;

@@ -57,6 +57,15 @@ AC_SUBST(EDJE_CC)
 AC_MSG_CHECKING([Which edje_cc to use])
 AC_MSG_RESULT(${EDJE_CC})
 
+PKG_CHECK_MODULES([json], [json-c],,
+       [PKG_CHECK_MODULES([json], [json],,
+          [PKG_CHECK_MODULES([json], [json0],,
+             [AC_MSG_WARN([No pkg-config for json-c (aka libjson0, libjson)])])])])
+# json library may be linked via -ljson, or -ljson-c. Try both.
+AC_CHECK_LIB([json], [json_object_new_string],,
+ [AC_CHECK_LIB([json-c], [json_object_new_string])]
+)
+
 datadir=$(pkg-config --variable=modules enlightenment)/${PACKAGE}
 AC_ARG_ENABLE(homedir-install,
   AS_HELP_STRING([--enable-homedir-install], [Install module in homedir]),

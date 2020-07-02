@@ -1,351 +1,167 @@
+#include <json-c/json.h>
 #include "parser.h"
 
 #define KM_TO_MI     1.609344
 #define MB_TO_IN     0.029530
 
-#define PARSER_TEST(val)         \
-  do                             \
-    {                            \
-       if (!needle)              \
-       {                         \
-          ERR("Parse: %s", val); \
-          goto error;             \
-       }                         \
-    }                            \
-  while(0)
-
-static char *
-seek_text(char * string, const char * value, int jump)
-{
-  if (string) string = strstr(string, value);
-  if (!string)
-   {
+#define JSON_JOGS(obj) ((obj)? json_object_get_string(obj): "")
+#define JSON_ATOI(obj, key)  atoi(JSON_JOGS(_json_object_object_get(obj, key)))
+#define JSON_ATOF(obj, key)  atof(JSON_JOGS(_json_object_object_get(obj, key)))
+#define JSON_SET_STR(str, obj, key, n)  strncpy(str, JSON_JOGS(_json_object_object_get(obj, key)), n)
+#define JSON_ARRAY_CHECK(obj, n) \
+    if (json_object_get_type(obj) != json_type_array || json_object_array_length(obj) != n) \
       goto error;
-  }
-  string += jump;
-  return string;
- 
-  error:
-   WRN("**: Couldn't parse info from data file\n");
-   return NULL;
- 
+
+json_object *
+_json_object_object_get(struct json_object *obj, const char *key)
+{
+    json_object *temp;
+    if (json_object_object_get_ex(obj, key, &temp))
+        return temp;
+    CRI("Error: in json obj or key");
+    return NULL;
+
 }
- 
+
 Eina_Bool
 fc_parse_json(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, 0);
-   
+
    Instance *inst = data;
- 
-   char *needle;
-   char city[256];
-   char region[256];
-   char country[256];
-   char location[513];
-   float visibility;
-   float pressure;
-   int have_lang = 0;
- 
    if (!inst->buffer)
      return EINA_FALSE;
-   
+
+   char *needle;
+   char city[256], region[256], country[256], location[513];
+   float visibility, pressure;
+   json_object *root, *main, *submain, *sub, *temp;
+   Eina_Bool have_lang =  (inst->ci->lang[0] != '\0') && strcmp(inst->ci->lang, "en");
+
    needle = (char *) eina_binbuf_string_get(inst->buffer);
    if (needle[0] == '\0') return EINA_FALSE;
-   
-   needle = seek_text(needle, "FeelsLikeC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("FeelsLikeC");
-   sscanf(needle, "%d\"", &inst->condition.feel_c);
-   
-   needle = seek_text(needle, "FeelsLikeF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("FeelsLikeF");
-   sscanf(needle, "%d\"", &inst->condition.feel_f);
-   
-   needle = seek_text(needle, "humidity", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("humidity");
-   sscanf(needle, "%d\"", &inst->details.atmosphere.humidity);
-   
-   if (inst->ci->lang[0] != '\0')
-   {
-     needle = seek_text(needle, "lang", 0);
-     needle = seek_text(needle, "value",0);
-     needle = seek_text(needle, ":", 3);
-     if (needle)
-     {
-        sscanf(needle, "%255[^\"]\"", inst->condition.desc);
-        have_lang = 1;
-      }
-      else 
-      {
-         have_lang = 0;
-         needle = (char *) eina_binbuf_string_get(inst->buffer);
-      }
+
+   root = json_tokener_parse(needle);
+
+    // Parse Json array "current_condition"
+    json_object *current_condition = _json_object_object_get(root,  "current_condition");
+    JSON_ARRAY_CHECK(current_condition, 1);
+
+    main = json_object_array_get_idx(current_condition, 0);
+
+    inst->condition.feel_c = JSON_ATOI(main, "FeelsLikeC");
+    inst->condition.feel_f = JSON_ATOI(main, "FeelsLikeF");
+    inst->details.atmosphere.humidity = JSON_ATOI(main, "humidity");
+    inst->details.atmosphere.precip = JSON_ATOF(main, "precipMM");
+    inst->details.atmosphere.pressure_km = JSON_ATOF(main, "pressure");
+    inst->details.atmosphere.pressure_mi = inst->details.atmosphere.pressure_km * MB_TO_IN;
+    inst->condition.temp_c = JSON_ATOI(main, "temp_C");
+    inst->condition.temp_f = JSON_ATOI(main, "temp_F");
+    inst->details.atmosphere.visibility_km = JSON_ATOF(main, "visibility");
+    inst->details.atmosphere.visibility_mi = inst->details.atmosphere.visibility_km * KM_TO_MI;
+    inst->condition.code = JSON_ATOI(main, "weatherCode");
+       inst->details.wind.speed_km = JSON_ATOI(main, "windspeedKmph");
+    inst->details.wind.speed_mi = JSON_ATOI(main, "windspeedMiles");
+
+    if (have_lang)
+    {
+      char lang_key[8];
+      snprintf(lang_key, 8, "lang_%s",inst->ci->lang);
+      json_object *lang = _json_object_object_get(main, lang_key);
+      JSON_ARRAY_CHECK(lang, 1);
+
+      submain = json_object_array_get_idx(lang, 0);
+      JSON_SET_STR(inst->condition.desc, submain, "value", 255);
+    }
+    else
+    {
+        json_object *weather_desc = _json_object_object_get(main, "weatherDesc");
+        JSON_ARRAY_CHECK(weather_desc, 1);
+
+        submain = json_object_array_get_idx(weather_desc, 0);
+        JSON_SET_STR(inst->condition.desc, submain, "value", 255);
+    }
+    // Parse Json array "nearest_area"
+    json_object *nearest_area = _json_object_object_get(root, "nearest_area");
+    JSON_ARRAY_CHECK(nearest_area, 1);
+
+    main = json_object_array_get_idx(nearest_area, 0);
+
+    json_object *area_name = _json_object_object_get(main, "areaName");
+    submain = json_object_array_get_idx(area_name, 0);
+    JSON_SET_STR(city, submain, "value", 255);
+
+    json_object *obj_country = _json_object_object_get(main, "country");
+    submain = json_object_array_get_idx(obj_country, 0);
+    JSON_SET_STR(country, submain, "value", 255);
+
+    json_object *obj_region = _json_object_object_get(main, "region");
+    submain = json_object_array_get_idx(obj_region, 0);
+    JSON_SET_STR(region, submain, "value", 255);
+
+    if (strcmp(city, region))
+       snprintf(location, 513, "%s, %s", city, region);
+    else
+       snprintf(location, 513, "%s", city);
+
+    eina_stringshare_replace(&inst->location, location);
+    eina_stringshare_replace(&inst->country, country);
+
+    // Parse Json array "weather" for days
+    json_object *weather = _json_object_object_get(root, "weather");
+    JSON_ARRAY_CHECK(weather, FORECASTS);
+
+    for (int i = 0; i < FORECASTS; i++)
+    {
+        main = json_object_array_get_idx(weather, i);
+        if (i == 0)
+        {
+            json_object *astronomy = _json_object_object_get(main, "astronomy");
+            submain = json_object_array_get_idx(astronomy, 0);
+            JSON_SET_STR(inst->details.astronomy.sunrise, submain, "sunrise", 8);
+            JSON_SET_STR(inst->details.astronomy.sunset, submain, "sunset", 8);
+        }
+        JSON_SET_STR(inst->forecast[i].date, main, "date", 12);
+        inst->forecast[i].high_c = JSON_ATOI(main, "maxtempC");
+        inst->forecast[i].high_f = JSON_ATOI(main, "maxtempF");
+        inst->forecast[i].low_c  = JSON_ATOI(main, "mintempC");
+        inst->forecast[i].low_f  = JSON_ATOI(main, "mintempF");
+        //      hourly subarray
+        json_object *hourly = _json_object_object_get(main, "hourly");
+        JSON_ARRAY_CHECK(hourly, 8);
+
+        submain = json_object_array_get_idx(hourly, 0);
+        if (i == 0)
+        {
+            inst->details.wind.chill_c = JSON_ATOI(submain, "WindChillC");
+            inst->details.wind.chill_f = JSON_ATOI(submain, "WindChillF");
+        }
+
+        if (have_lang)
+        {
+            char lang_key[8];
+            snprintf(lang_key, 8, "lang_%s",inst->ci->lang);
+            json_object *lang = _json_object_object_get(submain, lang_key);
+            JSON_ARRAY_CHECK(lang, 1);
+
+            sub = json_object_array_get_idx(lang, 0);
+            JSON_SET_STR(inst->forecast[i].desc, sub, "value", 255);
+        }
+        else
+        {
+            json_object *weather_desc = _json_object_object_get(submain, "weatherDesc");
+            JSON_ARRAY_CHECK(weather_desc, 1);
+
+            sub = json_object_array_get_idx(weather_desc, 0);
+            JSON_SET_STR(inst->forecast[i].desc, sub, "value", 255);
+        }
+        inst->forecast[i].code = JSON_ATOI(submain, "weatherCode");
    }
-   
-   needle = seek_text(needle, "localObsDateTime", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("localObsDateTime");
-   sscanf(needle, "%51[^\"]\"", inst->condition.update);
-   
-   needle = seek_text(needle, "precipMM", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("precipMM");
-   sscanf(needle, "%f\"", &inst->details.atmosphere.precip);
-   
-   needle = seek_text(needle, "pressure", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("pressure");
-   sscanf(needle, "%f\"", &pressure);
-   
-   inst->details.atmosphere.pressure_km = pressure;
-   inst->details.atmosphere.pressure_mi = pressure * MB_TO_IN;
-   
-   needle = seek_text(needle, "temp_C", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("temp_C");
-   sscanf(needle, "%d\"", &inst->condition.temp_c);
- 
-   needle = seek_text(needle, "temp_F", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("temp_F");
-   sscanf(needle, "%d\"", &inst->condition.temp_f);
- 
-   needle = seek_text(needle, "visibility", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("visibility");
-   sscanf(needle, "%f\"", &visibility);
-   inst->details.atmosphere.visibility_km = visibility;
-   inst->details.atmosphere.visibility_mi = visibility * KM_TO_MI;
-   
-   needle = seek_text(needle, "weatherCode", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("weatherCode");
-   sscanf(needle, "%d\"", &inst->condition.code);
- 
-   if (!have_lang)
-   {
-     needle = seek_text(needle, "weatherDesc", 0);
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("weatherDesc"); 
-     sscanf(needle, "%255[^\"]\"", inst->condition.desc);
-   }
-   
-   needle = seek_text(needle, "windspeedKmph", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("windspeedKmph"); 
-   sscanf(needle, "%d\"", &inst->details.wind.speed_km);
-   
-   needle = seek_text(needle, "windspeedMiles", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("windspeedMiles");  
-   sscanf(needle, "%d\"", &inst->details.wind.speed_mi);
-   
-   needle = seek_text(needle, "areaName", 0);
-   needle = seek_text(needle, "value", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("areaName"); 
-   sscanf(needle, "%255[^\"]\"", city);
-   
-   needle = seek_text(needle, "country", 0);
-   needle = seek_text(needle, "value", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("country");
-   sscanf(needle, "%255[^\"]\"", country);
-   
-   needle = seek_text(needle, "region", 0);
-   needle = seek_text(needle, "value", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("region");
-   sscanf(needle, "%255[^\"]\"", region);
-   
-   if (strcmp(city, region) == 0)
-       snprintf(location, 513, "%s", city); 
-   else
-       snprintf(location, 513, "%s, %s", city, region); 
-       
-   eina_stringshare_replace(&inst->location, location);
-   eina_stringshare_replace(&inst->country, country);
-   
-   needle = seek_text(needle, "sunrise", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("sunrise"); 
-   sscanf(needle, "%8[^\"]\"", inst->details.astronomy.sunrise);
-   
-   needle = seek_text(needle, "sunset", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("sunset");
-   sscanf(needle, "%8[^\"]\"", inst->details.astronomy.sunset);
-   
-   // day 0
-   needle = seek_text(needle, "date", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("date");
-   sscanf(needle, "%12[^\"]\"", inst->forecast[0].date);
-   
-   needle = seek_text(needle, "900", 0);
-   
-   needle = seek_text(needle, "WindChillC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("WindChillC");
-   sscanf(needle, "%d\"", &inst->details.wind.chill_c);
-   
-   needle = seek_text(needle, "WindChillF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("WindChillF");
-   sscanf(needle, "%d\"", &inst->details.wind.chill_f);
-   
-   if (have_lang)
-   {
-   needle = seek_text(needle, "lang", 0);
-   needle = seek_text(needle, "value", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("inst->forecast[0].desc");
-   sscanf(needle, "%255[^\"]\"", inst->forecast[0].desc);
-   }
-   
-   //~ needle = seek_text(needle, "1200", 0);
-   needle = seek_text(needle, "weatherCode", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("weatherCode");
-   sscanf(needle, "%d\"", &inst->forecast[0].code);
-   
-   if (!have_lang)
-   {
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("forecast[0].desc");
-     sscanf(needle, "%255[^\"]\"", inst->forecast[0].desc);
-   }
-   
-   needle = seek_text(needle, "maxtempC", 0);
-   needle = seek_text(needle, "maxtempC", 0); //TODO: are 2 tests needed here ?
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempC"); 
-   sscanf(needle, "%d\"", &inst->forecast[0].high_c);
-   
-   needle = seek_text(needle, "maxtempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempF"); 
-   sscanf(needle, "%d\"", &inst->forecast[0].high_f);
-   
-   needle = seek_text(needle, "mintempC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempC");
-   sscanf(needle, "%d\"", &inst->forecast[0].low_c);
-   
-   needle = seek_text(needle, "mintempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempF");
-   sscanf(needle, "%d\"", &inst->forecast[0].low_f);
-   
-   //day 1
-   needle = seek_text(needle, "date", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("inst->forecast[1].date");
-   sscanf(needle, "%12[^\"]\"", inst->forecast[1].date);
-   
-   if (have_lang)
-   {
-     needle = seek_text(needle, "900", 0);
-     needle = seek_text(needle, "lang", 0);
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("inst->forecast[1].desc"); 
-     sscanf(needle, "%255[^\"]\"", inst->forecast[1].desc);
-   }
-   
-   //~ needle = seek_text(needle, "1200", 0);
-   needle = seek_text(needle, "weatherCode", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("weatherCode");
-   sscanf(needle, "%d\"", &inst->forecast[1].code);
- 
-    if (!have_lang)
-   {
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("inst->forecast[1].desc");
-     sscanf(needle, "%255[^\"]\"", inst->forecast[1].desc);
-   }
-   
-   needle = seek_text(needle, "maxtempC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempC");
-   sscanf(needle, "%d\"", &inst->forecast[1].high_c);
-   
-   needle = seek_text(needle, "maxtempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempF");
-   sscanf(needle, "%d\"", &inst->forecast[1].high_f);
-   
-   needle = seek_text(needle, "mintempC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempC");
-   sscanf(needle, "%d\"", &inst->forecast[1].low_c);
-   
-   needle = seek_text(needle, "mintempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempF");
-   sscanf(needle, "%d\"", &inst->forecast[1].low_f);
-   
-   //day 2
-   needle = seek_text(needle, "date", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("date");
-   sscanf(needle, "%12[^\"]\"", inst->forecast[2].date);
-   
-   if (have_lang)
-   {
-     needle = seek_text(needle, "900", 0);
-     needle = seek_text(needle, "lang", 0);
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("inst->forecast[2].desc");
-     sscanf(needle, "%255[^\"]\"", inst->forecast[2].desc);
-   }
-   
-   //~ needle = seek_text(needle, "1200", 0);
-   needle = seek_text(needle, "weatherCode", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("weatherCode");
-   sscanf(needle, "%d\"", &inst->forecast[2].code);
- 
-    if (!have_lang)
-   {
-     needle = seek_text(needle, "value", 0);
-     needle = seek_text(needle, ":", 3);
-     PARSER_TEST("inst->forecast[2].desc");
-     sscanf(needle, "%255[^\"]\"", inst->forecast[2].desc);
-   }
-   
-   needle = seek_text(needle, "maxtempC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempC");
-   sscanf(needle, "%d\"", &inst->forecast[2].high_c);
-   
-   needle = seek_text(needle, "maxtempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("maxtempF");
-   sscanf(needle, "%d\"", &inst->forecast[2].high_f);
-   
-   needle = seek_text(needle, "mintempC", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempC");
-   sscanf(needle, "%d\"", &inst->forecast[2].low_c);
-   
-   needle = seek_text(needle, "mintempF", 0);
-   needle = seek_text(needle, ":", 3);
-   PARSER_TEST("mintempF"); 
-   sscanf(needle, "%d\"", &inst->forecast[2].low_f);
-   
+   json_object_put(root);
+
    return EINA_TRUE;
 
 error:
    WRN("**: Couldn't parse info from %s\n", inst->ci->host);
    return EINA_FALSE;
 }
- 

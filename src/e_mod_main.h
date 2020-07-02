@@ -42,7 +42,6 @@ EAPI extern E_Module_Api e_modapi;
 
 typedef struct _Config Config;
 typedef struct _Config_Item Config_Item;
-typedef struct _Popup Popup;
 
 struct _Config
 {

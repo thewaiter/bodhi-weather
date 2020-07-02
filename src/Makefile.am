@@ -1,6 +1,6 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = -I. \
+AM_CPPFLAGS = -I. \
 	   -I$(top_srcdir) \
 	   -I$(includedir) \
 	   @E_CFLAGS@
@@ -10,7 +10,12 @@ pkg_LTLIBRARIES = module.la
 module_la_SOURCES = e_mod_main.c \
 		    e_mod_main.h \
 		    e_mod_config.c \
-		    e_mod_config.h
+		    e_mod_config.h \
+		    common.h \
+		    parser.c \
+		    parser.h  \
+		    utility.c
+		    utility.h
 
 module_la_LIBADD = @E_LIBS@
 module_la_LDFLAGS = -module -avoid-version

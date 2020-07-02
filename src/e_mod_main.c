@@ -126,27 +126,27 @@ struct _Forecasts
 };
  
 /* Module Function Protos */
-static void         _forecasts_cb_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+static void         _cb_fc_mouse_down(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);
-static void         _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
-static void         _forecasts_menu_cb_post(void *data, E_Menu *m);
-static Eina_Bool    _forecasts_cb_check(void *data);
-static Config_Item *_forecasts_config_item_get(const char *id);
-static Forecasts   *_forecasts_new(Evas *evas);
-static void         _forecasts_free(Forecasts *w);
-static Eina_Bool    _forecasts_parse_json(void *data);
-static void         _forecasts_converter(Instance *inst);
-static void         _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__);
-static void         _forecasts_popup_content_create(Instance *inst);
-static Eina_Bool    _url_data_cb(void *data, int type __UNUSED__, void *event);
-static Eina_Bool    _url_complete_cb(void *data, int type __UNUSED__, void *event);
+static void         _cb_fc_menu_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__);
+static void         _cb_fc_menu_post(void *data, E_Menu *m);
+static Eina_Bool    _cb_fc_check(void *data);
+static Config_Item *_fc_config_item_get(const char *id);
+static Forecasts   *_fc_new(Evas *evas);
+static void         _fc_free(Forecasts *w);
+static Eina_Bool    _fc_parse_json(void *data);
+static void         _fc_converter(Instance *inst);
+static void         _fc_display_set(Instance *inst, Eina_Bool ok __UNUSED__);
+static void         _fc_popup_content_create(Instance *inst);
+static Eina_Bool    _cb_url_data(void *data, int type __UNUSED__, void *event);
+static Eina_Bool    _cb_url_complete(void *data, int type __UNUSED__, void *event);
 static void         _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void         _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void         _cb_mouse_out(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
-static Evas_Object *_forecasts_popup_icon_create(Evas *evas, int code);
-static void         _forecasts_popup_destroy(Instance *inst);
+static Evas_Object *_fc_popup_icon_create(Evas *evas, int code);
+static void         _fc_popup_destroy(Instance *inst);
 static void         _right_values_update(Instance *inst);
-static void          _forecasts_config_free(void);
+static void         _fc_config_free(void);
 
 /* Gadcon Functions */
 static E_Gadcon_Client *
@@ -159,13 +159,13 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
  
    inst = E_NEW(Instance, 1);
  
-   inst->ci = _forecasts_config_item_get(id);
+   inst->ci = _fc_config_item_get(id);
    inst->area = eina_stringshare_add(inst->ci->code);
    inst->language = eina_stringshare_add(inst->ci->lang);
    inst->label = eina_stringshare_add(inst->ci->label);
    inst->buffer = eina_binbuf_new();
  
-   w = _forecasts_new(gc->evas);
+   w = _fc_new(gc->evas);
    w->inst = inst;
    inst->forecasts = w;
 
@@ -182,17 +182,17 @@ _gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style)
    evas_object_event_callback_add(inst->forecasts_obj, EVAS_CALLBACK_MOUSE_OUT,
                                   _cb_mouse_out, inst);
    evas_object_event_callback_add(w->forecasts_obj, EVAS_CALLBACK_MOUSE_DOWN,	
-                                  _forecasts_cb_mouse_down, inst);
+                                  _cb_fc_mouse_down, inst);
 
    E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_COMPLETE,
-                         _url_complete_cb, inst);
+                         _cb_url_complete, inst);
    E_LIST_HANDLER_APPEND(inst->handlers, ECORE_CON_EVENT_URL_DATA,
-                         _url_data_cb, inst);
+                         _cb_url_data, inst);
 
    forecasts_config->instances =
      eina_list_append(forecasts_config->instances, inst);
  
-   inst->check_timer = ecore_timer_add(TIMER_DELAY, _forecasts_cb_check, inst);
+   inst->check_timer = ecore_timer_add(TIMER_DELAY, _cb_fc_check, inst);
 
    return gcc;
 }
@@ -206,7 +206,7 @@ _gc_shutdown(E_Gadcon_Client *gcc)
    inst = gcc->data;
    w = inst->forecasts;
  
-   if (inst->popup) _forecasts_popup_destroy(inst);
+   if (inst->popup) _fc_popup_destroy(inst);
    if (inst->check_timer)
      ecore_timer_del(inst->check_timer);
 
@@ -228,9 +228,9 @@ _gc_shutdown(E_Gadcon_Client *gcc)
      eina_list_remove(forecasts_config->instances, inst);
  
    evas_object_event_callback_del(w->forecasts_obj, EVAS_CALLBACK_MOUSE_DOWN,
-                                  _forecasts_cb_mouse_down);
+                                  _cb_fc_mouse_down);
  
-   _forecasts_free(w);
+   _fc_free(w);
    E_FREE(inst);
 }
  
@@ -281,12 +281,12 @@ _gc_id_new(const E_Gadcon_Client_Class *client_class __UNUSED__)
 {
    Config_Item *ci;
  
-   ci = _forecasts_config_item_get(NULL);
+   ci = _fc_config_item_get(NULL);
    return ci->id;
 }
  
 static void
-_forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+_cb_fc_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__)
 {
    EINA_SAFETY_ON_NULL_RETURN(data);
@@ -304,10 +304,10 @@ _forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUS
         mi = e_menu_item_new(m);
         e_menu_item_label_set(mi, D_("Settings"));
         e_util_menu_item_theme_icon_set(mi, "preferences-system");
-        e_menu_item_callback_set(mi, _forecasts_menu_cb_configure, inst);
+        e_menu_item_callback_set(mi, _cb_fc_menu_configure, inst);
  
         m = e_gadcon_client_util_menu_items_append(inst->gcc, m, 0);
-        e_menu_post_deactivate_callback_set(m, _forecasts_menu_cb_post, inst);
+        e_menu_post_deactivate_callback_set(m, _cb_fc_menu_post, inst);
         forecasts_config->menu = m;
  
         e_gadcon_canvas_zone_geometry_get(inst->gcc->gadcon, &x, &y, &w, &h);
@@ -322,7 +322,7 @@ _forecasts_cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUS
 }
 
 static void
-_forecasts_menu_cb_post(void *data, E_Menu *m)
+_cb_fc_menu_post(void *data, E_Menu *m)
 {
    if (!forecasts_config->menu)
      return;
@@ -331,7 +331,7 @@ _forecasts_menu_cb_post(void *data, E_Menu *m)
 }
  
 static void
-_forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)
+_cb_fc_menu_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi __UNUSED__)
 {
    EINA_SAFETY_ON_NULL_RETURN(data);
    
@@ -345,7 +345,7 @@ _forecasts_menu_cb_configure(void *data, E_Menu *m __UNUSED__, E_Menu_Item *mi _
  
 
 static Config_Item *
-_forecasts_config_item_get(const char *id)
+_fc_config_item_get(const char *id)
 {
    Eina_List *l;
    Config_Item *ci;
@@ -404,7 +404,7 @@ EAPI E_Module_Api e_modapi = {
 /* This is called when we need to cleanup the actual configuration,
  * for example when our configuration is too old */
 static void
-_forecasts_config_free(void)
+_fc_config_free(void)
 {
    EINA_SAFETY_ON_NULL_RETURN(forecasts_config);
    while (forecasts_config->items)
@@ -468,7 +468,7 @@ e_modapi_init(E_Module *m)
    if (forecasts_config) {
      /* Check config version */
      if (!e_util_module_config_check("Forecasts", forecasts_config->version, MOD_CONFIG_FILE_VERSION))
-       _forecasts_config_free();
+       _fc_config_free();
    }
    
    if (!forecasts_config)
@@ -521,7 +521,7 @@ e_modapi_shutdown(E_Module *m __UNUSED__)
     *    forecasts_config->menu = NULL;
     *} */
  
-   _forecasts_config_free();
+   _fc_config_free();
  
    E_CONFIG_DD_FREE(conf_item_edd);
    E_CONFIG_DD_FREE(conf_edd);
@@ -539,7 +539,7 @@ e_modapi_save(E_Module *m __UNUSED__)
 }
  
 static Forecasts *
-_forecasts_new(Evas *evas)
+_fc_new(Evas *evas)
 {
    Forecasts *w;
    char buf[4096];
@@ -565,7 +565,7 @@ _forecasts_new(Evas *evas)
 }
  
 static void
-_forecasts_free(Forecasts *w)
+_fc_free(Forecasts *w)
 {
    char name[60];
    int i;
@@ -586,7 +586,7 @@ _forecasts_free(Forecasts *w)
 }
 
 static Eina_Bool
-_forecasts_cb_check(void *data)
+_cb_fc_check(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
 
@@ -625,7 +625,7 @@ _forecasts_cb_check(void *data)
 
 
 static Eina_Bool
-_url_data_cb(void *data, int type __UNUSED__, void *event)
+_cb_url_data(void *data, int type __UNUSED__, void *event)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, ECORE_CALLBACK_PASS_ON);
    
@@ -643,7 +643,7 @@ _url_data_cb(void *data, int type __UNUSED__, void *event)
 
 
 static Eina_Bool
-_url_complete_cb(void *data, int type __UNUSED__, void *event)
+_cb_url_complete(void *data, int type __UNUSED__, void *event)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, ECORE_CALLBACK_PASS_ON);
    
@@ -654,11 +654,11 @@ _url_complete_cb(void *data, int type __UNUSED__, void *event)
    if (data != ecore_con_url_data_get(ev->url_con)) return ECORE_CALLBACK_PASS_ON;
    if (ev->status != 200) return ECORE_CALLBACK_DONE;
 
-   ret = _forecasts_parse_json(inst);
+   ret = _fc_parse_json(inst);
    if (ret)
    {
-      _forecasts_converter(inst);
-      _forecasts_display_set(inst, ret);
+      _fc_converter(inst);
+      _fc_display_set(inst, ret);
    }
    eina_binbuf_reset(inst->buffer);
    
@@ -684,7 +684,7 @@ seek_text(char * string, const char * value, int jump)
 }
  
 static Eina_Bool
-_forecasts_parse_json(void *data)
+_fc_parse_json(void *data)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(data, 0);
    
@@ -1003,7 +1003,7 @@ error:
  
  
 void
-_forecasts_converter(Instance *inst)
+_fc_converter(Instance *inst)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  
@@ -1074,13 +1074,13 @@ _right_values_update(Instance *inst)
         if (swallow)
           evas_object_del(swallow);
         edje_object_part_swallow(inst->forecasts->forecasts_obj, name,
-                                 _forecasts_popup_icon_create(inst->gcc->gadcon->evas, inst->forecast[i].code));
+                                 _fc_popup_icon_create(inst->gcc->gadcon->evas, inst->forecast[i].code));
       }
 }
  
  
 static void
-_forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
+_fc_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  
@@ -1119,12 +1119,12 @@ _forecasts_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
    if (inst->gcc->gadcon->orient == E_GADCON_ORIENT_FLOAT)
       _right_values_update(inst); //Updating right two icons description
  
-   if (inst->popup) _forecasts_popup_destroy(inst);
+   if (inst->popup) _fc_popup_destroy(inst);
    inst->popup = NULL;
 }
  
 void
-_forecasts_config_updated(Config_Item *ci)
+_fc_config_updated(Config_Item *ci)
 {
    Eina_List *l;
    char buf[4096];
@@ -1153,9 +1153,9 @@ _forecasts_config_updated(Config_Item *ci)
         if (inst->label) eina_stringshare_del(inst->label);
         inst->label = eina_stringshare_add(inst->ci->label);
        
-        _forecasts_converter(inst);
+        _fc_converter(inst);
        
-        if (inst->popup) _forecasts_popup_destroy(inst);
+        if (inst->popup) _fc_popup_destroy(inst);
         inst->popup = NULL;
  
         snprintf(buf, sizeof(buf), "%d °%c", inst->condition.temp, inst->units.temp);
@@ -1166,17 +1166,17 @@ _forecasts_config_updated(Config_Item *ci)
         else
           edje_object_signal_emit(inst->forecasts_obj, "e,state,description,show", "e");
  
-        _forecasts_display_set(inst, 1);
+        _fc_display_set(inst, 1);
         //Updating right two icons description
         _right_values_update(inst);
        
  
         if ((area_changed) || (lang_changed))
-          _forecasts_cb_check(inst);
+          _cb_fc_check(inst);
  
         if (!inst->check_timer)
           inst->check_timer =
-            ecore_timer_add(inst->ci->poll_time, _forecasts_cb_check,
+            ecore_timer_add(inst->ci->poll_time, _cb_fc_check,
                             inst);
         else
           ecore_timer_interval_set(inst->check_timer,
@@ -1185,7 +1185,7 @@ _forecasts_config_updated(Config_Item *ci)
 }
  
 static void
-_forecasts_popup_content_create(Instance *inst)
+_fc_popup_content_create(Instance *inst)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  
@@ -1208,7 +1208,7 @@ _forecasts_popup_content_create(Instance *inst)
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 0, row, 2, 1, 0, 1, 1, 0);
  
-   oi = _forecasts_popup_icon_create(inst->popup->win->evas, inst->condition.code);
+   oi = _fc_popup_icon_create(inst->popup->win->evas, inst->condition.code);
    edje_object_size_max_get(oi, &w, &h);
    if (w > 160) w = 160;  /* For now there is a limit to how big the icon should be */
    if (h > 160) h = 160;  /* In the future, the icon should be set from the theme, not part of the table */
@@ -1295,7 +1295,7 @@ _forecasts_popup_content_create(Instance *inst)
         e_widget_frametable_object_append(of, ob, 1, row, 1, 1, 1, 0, 1, 0);
  
         ob = e_widget_image_add_from_object(evas,
-                                            _forecasts_popup_icon_create(inst->popup->win->evas,
+                                            _fc_popup_icon_create(inst->popup->win->evas,
                                                                          inst->forecast[i].code), 0, 0);
         e_widget_frametable_object_append(of, ob, 2, row, 1, 2, 1, 1, 0, 0);
  
@@ -1319,7 +1319,7 @@ _forecasts_popup_content_create(Instance *inst)
 }
  
 static Evas_Object *
-_forecasts_popup_icon_create(Evas *evas, int code)
+_fc_popup_icon_create(Evas *evas, int code)
 {
    char buf[4096];
    char m[4096];
@@ -1336,7 +1336,7 @@ _forecasts_popup_icon_create(Evas *evas, int code)
 }
  
 static void
-_forecasts_popup_destroy(Instance *inst)
+_fc_popup_destroy(Instance *inst)
 {
    EINA_SAFETY_ON_NULL_RETURN(inst);
  
@@ -1355,13 +1355,13 @@ _cb_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
  
    if ((ev->button == 1) && (ev->flags & EVAS_BUTTON_DOUBLE_CLICK))  
     {
-     _forecasts_cb_check(inst);
+     _cb_fc_check(inst);
     }
     else if (ev->button == 1)
      {
        if (!inst->ci->popup_on_hover)
           {
-             if (!inst->popup) _forecasts_popup_content_create(inst);
+             if (!inst->popup) _fc_popup_content_create(inst);
              e_gadcon_popup_show(inst->popup);
              return;
           }
@@ -1378,7 +1378,7 @@ _cb_mouse_in(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Instance *inst = data;
    if (!inst->ci->popup_on_hover) return;
  
-   if (!inst->popup) _forecasts_popup_content_create(inst);
+   if (!inst->popup) _fc_popup_content_create(inst);
    e_gadcon_popup_show(inst->popup);
 }
  

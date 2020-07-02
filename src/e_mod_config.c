@@ -188,7 +188,7 @@ _basic_apply_data(E_Config_Dialog *cfd, E_Config_Dialog_Data *cfdata)
    ci->popup_on_hover = cfdata->popup_on_hover;
 
    e_config_save_queue();
-   _forecasts_config_updated(ci);
+   _fc_config_updated(ci);
    return 1;
 }
 

@@ -163,5 +163,6 @@ fc_parse_json(void *data)
 
 error:
    WRN("**: Couldn't parse info from %s\n", inst->ci->host);
+   json_object_put(root);
    return EINA_FALSE;
 }

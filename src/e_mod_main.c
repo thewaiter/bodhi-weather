@@ -670,7 +670,11 @@ _fc_display_set(Instance *inst, Eina_Bool ok __UNUSED__)
    else
      edje_object_signal_emit(inst->forecasts_obj, "e,state,description,show", "e");
  
+   if (inst->gcc->gadcon->orient == E_GADCON_ORIENT_FLOAT)
    snprintf(buf, sizeof(buf), "%d °%c", inst->condition.temp, inst->units.temp);
+   else 
+   snprintf(buf, sizeof(buf), "%d°", inst->condition.temp);
+   
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.temp", buf);
    edje_object_part_text_set(inst->forecasts->forecasts_obj, "e.text.description",
                              inst->condition.desc);
@@ -771,10 +775,13 @@ _fc_popup_content_create(Instance *inst)
  
    evas = inst->popup->win->evas;
    o = e_widget_list_add(evas, 0, 0);
-   snprintf(buf, sizeof(buf), D_("%s: Current Conditions"), inst->location);
+   if (inst->ci->label[0] == '\0')
+     snprintf(buf, sizeof(buf), D_("%s: Current Conditions"), inst->location);
+   else
+     snprintf(buf, sizeof(buf), D_("%s: Current Conditions"), inst->label);
    of = e_widget_frametable_add(evas, buf, 0);
  
-   snprintf(buf, sizeof(buf), "%s: %d°%c", inst->condition.desc, inst->condition.temp, inst->units.temp);
+   snprintf(buf, sizeof(buf), "%s: %d °%c", inst->condition.desc, inst->condition.temp, inst->units.temp);
    ob = e_widget_label_add(evas, buf);
    e_widget_frametable_object_append(of, ob, 0, row, 2, 1, 0, 1, 1, 0);
  
@@ -842,7 +849,16 @@ _fc_popup_content_create(Instance *inst)
  
    e_widget_list_object_append(o, of, 1, 1, 0.5);
    ol = e_widget_list_add(evas, 1, 1);
- 
+   
+   //block of code to retrieve a 3rd week day name
+   time_t t;
+   struct tm *tmp;
+   char buf_time[1024]; 
+   t = time(NULL) + 48 * 3600;  //48 hours 
+   tmp = localtime(&t); 
+   strftime(buf_time, 1024, "%A", tmp);
+   //---------------------------------------------
+   
    for (i = 0; i < inst->ci->days; i++)
      {
         row = 0;
@@ -852,7 +868,8 @@ _fc_popup_content_create(Instance *inst)
         else if (i == 1)
           snprintf(buf, sizeof(buf), D_("Tomorrow"));
         else
-          snprintf(buf, sizeof(buf), "%s", inst->forecast[i].date);
+           snprintf(buf, sizeof(buf), "%s", buf_time);
+          //~ snprintf(buf, sizeof(buf), "%s", inst->forecast[i].date);
         of = e_widget_frametable_add(evas, buf, 0);
  
         ob = e_widget_label_add(evas, inst->forecast[i].desc);
